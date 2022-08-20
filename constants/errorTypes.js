@@ -1,0 +1,24 @@
+exports.errorMessages = {
+  // user errors
+  USER_NOT_FOUND: 'user-not-found',
+  USER_EXIST: 'user-exist',
+  INVALID_CREDENTIALS: 'invalid-credentials',
+  TOKEN_NOT_FOUND: 'token-not-found',
+  INVALID_TOKEN: 'invalid-token',
+  // order errors
+  ORDER_ID_TAKEN: 'order-id-taken',
+  ORDER_NOT_FOUND: 'order-not-found',
+  // expense errors
+  EXPENSE_ID_TAKEN: 'expense-id-taken',
+  EXPENSE_NOT_FOUND: 'expense-not-found',
+  // incomes errors
+  INCOME_ID_TAKEN: 'income-id-taken',
+  INCOME_NOT_FOUND: 'income-not-found',
+  // cloudinary errors
+  IMAGE_NOT_FOUND: 'image-not-found',
+  // forms errors
+  FIELDS_EMPTY: 'fields-empty',
+  // global errors
+  SERVER_ERROR: 'server-error'
+}
+
