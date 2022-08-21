@@ -9,7 +9,9 @@ const { expenseLabels } = require("../constants/expenseLabels");
 
 module.exports.getExpenses = async (req, res, next) => {
   try {
-    const expenses = await Expenses.find({}).populate('user');
+    const { office } = req.query;
+    const mongoQuery = office ? { placedAt: office } : {}
+    const expenses = await Expenses.find(mongoQuery).populate('user');
     res.status(200).json(expenses);
   } catch (error) {
     return next(new ErrorHandler(404, error.message));

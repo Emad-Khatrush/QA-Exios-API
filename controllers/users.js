@@ -25,7 +25,10 @@ module.exports.createUser = async (req, res) => {
       lastName: req.body.lastName,
       imgUrl: req.body.imgUrl,
       password: hashedPassword,
-      customerId
+      customerId,
+      roles: {
+        isEmployee: true
+      }
     });
 
     const token = await user.getSignedToken();
@@ -83,6 +86,19 @@ module.exports.verifyToken = async (req, res, next) => {
   }
 }
 
+module.exports.getEmpoyeeHomeData = async (req, res, next) => {
+  try {
+    const offices = await Office.find({ office: 'tripoli' });
+    const debts = await Orders.find({ 'debt.total': { $gt: 0 }, placedAt: 'tripoli' });
+    res.status(200).json({
+      offices,
+      debts
+    })
+  } catch (error) {
+    return next(new ErrorHandler(401, errorMessages.INVALID_TOKEN));
+  }
+}
+
 module.exports.getHomeData = async (req, res, next) => {
   const currentMonthByNumber = moment().month() + 1; // from Jun 0 to Dec 11
   try {
@@ -90,12 +106,7 @@ module.exports.getHomeData = async (req, res, next) => {
 
     const activeOrdersCount = await Orders.count({ isFinished: false, unsureOrder: false, isCanceled: false });
 
-    const totalDebts = await Orders.aggregate([
-      { $match: { 'debt.total': { $ne: 0 } } },
-      { $group: { _id: { office: '$placedAt', currency: '$debt.currency'}, totalDebts: { $sum: '$debt.total' } } },
-      { $project: { _id: 0, office: '$_id.office', currency: '$_id.currency', totalDebts: 1 } },
-      { $sort: { office: 1 , currency: -1 } }
-    ])
+    const debts = await Orders.find({ 'debt.total': { $gt: 0 } });
 
     const totalInvoices = (await Orders.aggregate([
       { $addFields: { 'month': { $month: '$createdAt' } } },
@@ -172,7 +183,7 @@ module.exports.getHomeData = async (req, res, next) => {
       activeOrdersCount,
       totalInvoices,
       offices,
-      totalDebts
+      debts
     })
   } catch (error) {
     console.log(error);
