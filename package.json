@@ -25,6 +25,7 @@
     "multer": "^1.4.4",
     "multer-storage-cloudinary": "^4.0.0",
     "order-id": "^2.1.2",
+    "os": "^0.1.2",
     "streamifier": "^0.1.1"
   }
 }

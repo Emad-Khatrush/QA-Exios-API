@@ -9,6 +9,9 @@ const moment = require('moment-timezone');
 const Office = require('../models/office');
 const { generateString } = require('../middleware/helper');
 
+const os = require('os');
+console.log(os.cpus().length);
+
 module.exports.createUser = async (req, res) => {
   try {
     const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
