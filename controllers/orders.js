@@ -26,39 +26,27 @@ module.exports.getOrders = async (req, res, next) => {
     // await Orders.deleteMany({})
     const tabTypeQuery = getTapTypeQuery(tabType);
     const orders = await Orders.find(tabTypeQuery).populate('user').sort({ createdAt: -1 }).skip(skip).limit(limit);
-    const totalOrders = await Orders.count();
-    const activeOrders = await Orders.aggregate([
-      { $match: { isFinished: false,  unsureOrder: false } },
-    ])
+    const allOrders = await Orders.find({});
+    const totalOrders = allOrders.length;
 
-    const shipmentOrders = await Orders.aggregate([
-      { $match: { isShipment: true,  unsureOrder: false, isPayment: false,  isFinished: false } },
-    ])
-
-    const arrivingOrders = await Orders.aggregate([
-      { $match: { isPayment: true,  orderStatus: 1 } },
-    ])
-
-    const unpaidOrders = await Orders.aggregate([
-      { $match: { unsureOrder: false,  orderStatus: 0, isPayment: true } },
-    ])
-
-    const finishedOrders = await Orders.aggregate([
-      { $match: { isFinished: true } },
-    ])
-    
-    const unsureOrders = await Orders.aggregate([
-      { $match: { unsureOrder: true } },
-    ])
+    let activeOrders = 0, arrivingOrders = 0, shipmentOrders = 0, unpaidOrders = 0, finishedOrders = 0, unsureOrders = 0;
+    allOrders.forEach((order => {
+      if (!order.isFinished &&  !order.unsureOrder) activeOrders++;
+      if (order.isShipment &&  !order.unsureOrder && !order.isPayment &&  !order.isFinished) shipmentOrders++;
+      if (order.isPayment &&  order.orderStatus === 1) arrivingOrders++;
+      if (order.isPayment &&  !order.unsureOrder && order.orderStatus === 0) unpaidOrders++;
+      if (order.isFinished) finishedOrders++;
+      if (order.unsureOrder) unsureOrders++;
+    }))
     
     res.status(200).json({
       orders,
-      activeOrdersCount: activeOrders.length,
-      shipmentOrdersCount: shipmentOrders.length,
-      finishedOrdersCount: finishedOrders.length,
-      unpaidOrdersCount: unpaidOrders.length,
-      unsureOrdersCount: unsureOrders.length,
-      arrivingOrdersCount: arrivingOrders.length,
+      activeOrdersCount: activeOrders,
+      shipmentOrdersCount: shipmentOrders,
+      finishedOrdersCount: finishedOrders,
+      unpaidOrdersCount: unpaidOrders,
+      unsureOrdersCount: unsureOrders,
+      arrivingOrdersCount: arrivingOrders,
       tabType: tabType ? tabType : 'active',
       total: totalOrders,
       query: {
