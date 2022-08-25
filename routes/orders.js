@@ -17,6 +17,9 @@ router.route('/orders')
       .get(protect, orders.getOrders)
       .post(protect, upload.array('files'), orders.createOrder);
 
+router.route('/currentOrdersTab')
+      .get(protect, orders.getOrdersTab)
+
 router.route('/orders/:searchValue/:searchType')
       .get(orders.getOrdersBySearch)
 

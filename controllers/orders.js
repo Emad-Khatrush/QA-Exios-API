@@ -59,6 +59,28 @@ module.exports.getOrders = async (req, res, next) => {
   }
 }
 
+module.exports.getOrdersTab = async (req, res, next) => {
+  try {
+    const { limit, skip, tabType } = req.query;
+    // await Orders.deleteMany({})
+    const tabTypeQuery = getTapTypeQuery(tabType);
+    const orders = await Orders.find(tabTypeQuery).populate('user').sort({ createdAt: -1 }).skip(skip).limit(limit);
+    const totalOrders = await Orders.count();
+    
+    res.status(200).json({
+      orders,
+      tabType: tabType ? tabType : 'active',
+      total: totalOrders,
+      query: {
+        limit: Number(limit),
+        skip: Number(skip)
+      }
+    });
+  } catch (error) {
+    return next(new ErrorHandler(404, error.message));
+  }
+}
+
 module.exports.getOrdersBySearch = async (req, res, next) => {
   const { searchValue, searchType } = req.params;
   const { tabType } = req.query;
