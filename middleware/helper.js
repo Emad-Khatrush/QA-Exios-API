@@ -16,29 +16,29 @@ exports.addChangedField = (fieldName, newData, oldData, labels) => {
             return {
                 label: labels[fieldName],
                 value: fieldName,
-                changedFrom: `${oldData?.total || '0'} ${oldData?.currency || ''}`,
-                changedTo: `${newData?.total || '0'} ${newData?.currency || ''}`
+                changedFrom: `${oldData?.total || '0'} ${oldData?.currency || 'empty'}`,
+                changedTo: `${newData?.total || '0'} ${newData?.currency || 'empty'}`
               }
         case 'cost':
         return {
             label: labels[fieldName],
             value: fieldName,
-            changedFrom: `${oldData?.total || '0'} ${oldData?.currency || ''}`,
-            changedTo: `${newData?.total || '0'} ${newData?.currency || ''}`
+            changedFrom: `${oldData?.total || '0'} ${oldData?.currency || 'empty'}`,
+            changedTo: `${newData?.total || '0'} ${newData?.currency || 'empty'}`
             }
         case 'paymentList':
             return {
                 label: labels[fieldName],
                 value: fieldName,
-                changedFrom: String(oldData?.length) || '0',
-                changedTo: String(newData?.length) || '0',
+                changedFrom: String(oldData?.length) || 'empty',
+                changedTo: String(newData?.length) || 'empty',
             }
     
         default:
             return {
                 label: labels[fieldName],
                 value: fieldName,
-                changedFrom: oldData,
+                changedFrom: oldData || 'empty',
                 changedTo: newData,
             }
     }

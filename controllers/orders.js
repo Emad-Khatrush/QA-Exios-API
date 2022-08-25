@@ -83,39 +83,9 @@ module.exports.getOrdersBySearch = async (req, res, next) => {
     ]
   }
   try {
-    const activeOrders = await Orders.aggregate([
-      { $match: { isFinished: false,  unsureOrder: false } },
-    ])
-
-    const shipmentOrders = await Orders.aggregate([
-      { $match: { isShipment: true,  unsureOrder: false, isPayment: false,  isFinished: false } },
-    ])
-
-    const arrivingOrders = await Orders.aggregate([
-      { $match: { isPayment: true,  orderStatus: 1 } },
-    ])
-
-    const unpaidOrders = await Orders.aggregate([
-      { $match: { unsureOrder: false,  orderStatus: 0 } },
-    ])
-
-    const finishedOrders = await Orders.aggregate([
-      { $match: { isFinished: true } },
-    ])
-    
-    const unsureOrders = await Orders.aggregate([
-      { $match: { unsureOrder: true } },
-    ])
-    
     const orders = await Orders.aggregate(query);
     res.status(200).json({
       orders,
-      activeOrdersCount: activeOrders.length,
-      shipmentOrdersCount: shipmentOrders.length,
-      finishedOrdersCount: finishedOrders.length,
-      unpaidOrdersCount: unpaidOrders.length,
-      unsureOrdersCount: unsureOrders.length,
-      arrivingOrdersCount: arrivingOrders.length,
       tabType: tabType ? tabType : 'active',
       total: totalOrders
     })
