@@ -113,14 +113,14 @@ module.exports.getHomeData = async (req, res, next) => {
 
     const totalInvoices = (await Orders.aggregate([
       { $addFields: { 'month': { $month: '$createdAt' } } },
-      { $match: { isFinished: false, unsureOrder: false, isCanceled: false, month: currentMonthByNumber } },
+      { $match: { unsureOrder: false, isCanceled: false, month: currentMonthByNumber } },
       { $group: { _id: '$month', totalInvoices: { $sum: '$totalInvoice' } } },
       { $project: { totalInvoices: 1, _id: 0 } },
     ]))[0]?.totalInvoices || 0;
 
     const thisMonthlyEarning = (await Orders.aggregate([
       { $addFields: { 'month': { $month: '$createdAt' } } },
-      { $match: { isFinished: false, unsureOrder: false, isCanceled: false, month: currentMonthByNumber } },
+      { $match: { unsureOrder: false, isCanceled: false, month: currentMonthByNumber } },
       { $unwind: '$netIncome' },
       { $group: { _id: '$month', totalNetOfMonth: { $sum: '$netIncome.total' } } },
       { $project: { _id: 0, totalNetOfMonth: 1 } },
@@ -128,7 +128,7 @@ module.exports.getHomeData = async (req, res, next) => {
 
     const previousMonthlyEarning = (await Orders.aggregate([
       { $addFields: { 'month': { $month: '$createdAt' } } },
-      { $match: { isFinished: false, unsureOrder: false, isCanceled: false, month: currentMonthByNumber - 1 } },
+      { $match: { unsureOrder: false, isCanceled: false, month: currentMonthByNumber - 1 } },
       { $unwind: '$netIncome' },
       { $group: { _id: '$month', totalNetOfMonth: { $sum: '$netIncome.total' } } },
       { $project: { _id: 0, totalNetOfMonth: 1 } },
@@ -136,7 +136,7 @@ module.exports.getHomeData = async (req, res, next) => {
 
     const thisShipmentMonthlyEarning = (await Orders.aggregate([
       { $addFields: { 'month': { $month: '$createdAt' } } },
-      { $match: { isFinished: false, unsureOrder: false, isCanceled: false, month: currentMonthByNumber } },
+      { $match: { unsureOrder: false, isCanceled: false, month: currentMonthByNumber } },
       { $unwind: '$paymentList' },
       {
         $group: {
@@ -152,7 +152,7 @@ module.exports.getHomeData = async (req, res, next) => {
 
     const previousShipmentMonthlyEarning = (await Orders.aggregate([
       { $addFields: { 'month': { $month: '$createdAt' } } },
-      { $match: { isFinished: false, unsureOrder: false, isCanceled: false, month: currentMonthByNumber - 1 } },
+      { $match: { unsureOrder: false, isCanceled: false, month: currentMonthByNumber - 1 } },
       { $unwind: '$paymentList' },
       {
         $group: {
