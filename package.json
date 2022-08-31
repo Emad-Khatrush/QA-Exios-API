@@ -11,6 +11,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@google-cloud/storage": "^6.4.1",
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.20.0",
     "cloudinary": "^1.29.1",
@@ -26,6 +27,8 @@
     "multer-storage-cloudinary": "^4.0.0",
     "order-id": "^2.1.2",
     "os": "^0.1.2",
-    "streamifier": "^0.1.1"
+    "streamifier": "^0.1.1",
+    "util": "^0.12.4",
+    "uuid": "^8.3.2"
   }
 }

@@ -2,7 +2,7 @@ const Orders = require('../models/order');
 const Activities = require('../models/activities');
 const orderid = require('order-id')('key');
 const ErrorHandler = require('../utils/errorHandler');
-const { uploadFromBuffer } = require('../utils/cloudinary');
+const { uploadToGoogleCloud } = require('../utils/googleClould');
 const { errorMessages } = require('../constants/errorTypes');
 const Offices = require('../models/office');
 const { addChangedField, getTapTypeQuery } = require('../middleware/helper');
@@ -119,10 +119,10 @@ module.exports.createOrder = async (req, res, next) => {
     const images = [];
     if (req.files) {
       for (let i = 0; i < req.files.length; i++) {
-        const uploadedImg = await uploadFromBuffer(req.files[i], "exios-admin-invoices");
+        const uploadedImg = await uploadToGoogleCloud(req.files[i], "exios-admin-invoices");
         images.push({
-          path: uploadedImg.secure_url,
-          filename: uploadedImg.public_id,
+          path: uploadedImg.publicUrl,
+          filename: uploadedImg.filename,
           folder: uploadedImg.folder,
           bytes: uploadedImg.bytes,
           category: req.body.invoicesCount > i ? 'invoice' : 'receipts'
@@ -388,25 +388,25 @@ module.exports.createUnsureOrder = async (req, res, next) => {
 
 module.exports.uploadFiles= async (req, res, next) => {
   const { id } = req.body;
-
+  
   const images = [];
   const changedFields = [];
 
     if (req.files) {
       for (let i = 0; i < req.files.length; i++) {
-        const uploadedImg = await uploadFromBuffer(req.files[i], "exios-admin-invoices");
+        const uploadedImg = await uploadToGoogleCloud(req.files[i], "exios-admin-invoices");
         images.push({
-          path: uploadedImg.secure_url,
-          filename: uploadedImg.public_id,
+          path: uploadedImg.publicUrl,
+          filename: uploadedImg.filename,
           folder: uploadedImg.folder,
           bytes: uploadedImg.bytes,
-          category: req.body.type
+          category: req.body.type   
         });
         changedFields.push({
           label: 'image',
           value: 'image',
           changedFrom: '',
-          changedTo: uploadedImg.secure_url
+          changedTo: uploadedImg.publicUrl
         })
       }
     }

@@ -1,7 +1,7 @@
 const Incomes = require("../models/income");
 const Activities = require("../models/activities");
 const ErrorHandler = require('../utils/errorHandler');
-const { uploadFromBuffer } = require('../utils/cloudinary');
+const { uploadToGoogleCloud } = require('../utils/googleClould');
 const { errorMessages } = require("../constants/errorTypes");
 const Offices = require("../models/office");
 const { addChangedField } = require("../middleware/helper");
@@ -25,10 +25,10 @@ module.exports.createIncome = async (req, res, next) => {
     const images = [];
     if (req.files) {
       for (let i = 0; i < req.files.length; i++) {
-        const uploadedImg = await uploadFromBuffer(req.files[i], "exios-admin-incomes");
+        const uploadedImg = await uploadToGoogleCloud(req.files[i], "exios-admin-incomes");
         images.push({
-          path: uploadedImg.secure_url,
-          filename: uploadedImg.public_id,
+          path: uploadedImg.publicUrl,
+          filename: uploadedImg.filename,
           folder: uploadedImg.folder,
           bytes: uploadedImg.bytes
         });
@@ -153,10 +153,10 @@ module.exports.uploadFiles= async (req, res, next) => {
 
   if (req.files) {
     for (let i = 0; i < req.files.length; i++) {
-      const uploadedImg = await uploadFromBuffer(req.files[i], "exios-admin-incomes");
+      const uploadedImg = await uploadToGoogleCloud(req.files[i], "exios-admin-incomes");
       images.push({
-        path: uploadedImg.secure_url,
-        filename: uploadedImg.public_id,
+        path: uploadedImg.publicUrl,
+        filename: uploadedImg.filename,
         folder: uploadedImg.folder,
         bytes: uploadedImg.bytes
       });
@@ -164,7 +164,7 @@ module.exports.uploadFiles= async (req, res, next) => {
         label: 'image',
         value: 'image',
         changedFrom: '',
-        changedTo: uploadedImg.secure_url
+        changedTo: uploadedImg.publicUrl
       })
     }
   }

@@ -3,10 +3,14 @@ const express = require('express');
 const orders = require('../controllers/orders');
 const { protect } = require('../middleware/check-auth');
 const multer = require('multer');
-
 // cloudinary settings
 const { storage } = require('../utils/cloudinary');
-const upload = multer({ storage });
+const upload = multer({
+      storage: multer.memoryStorage(),
+      limits: {
+            fileSize: 10 * 1024 * 1024, // No larger than 5mb, change as you need
+      },
+});
 
 const router  = express.Router();
 
@@ -27,7 +31,7 @@ router.route('/unsureOrder/add')
       .post(protect, orders.createUnsureOrder);
 
 router.route('/order/uploadFiles')
-      .post(protect, upload.array('files'), orders.uploadFiles);
+      .post(upload.array('files'), orders.uploadFiles);
       
 router.route('/order/deleteFiles')
       .delete(protect, orders.deleteFiles);
