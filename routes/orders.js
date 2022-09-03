@@ -31,7 +31,7 @@ router.route('/unsureOrder/add')
       .post(protect, orders.createUnsureOrder);
 
 router.route('/order/uploadFiles')
-      .post(upload.array('files'), orders.uploadFiles);
+      .post(protect, upload.array('files'), orders.uploadFiles);
       
 router.route('/order/deleteFiles')
       .delete(protect, orders.deleteFiles);
