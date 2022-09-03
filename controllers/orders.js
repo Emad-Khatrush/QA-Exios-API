@@ -11,7 +11,7 @@ const mongoose = require('mongoose');
 
 module.exports.getInvoices = async (req, res, next) => {
   try {
-    const orders = await Orders.find({});
+    const orders = await Orders.find({}).populate('user');
     res.status(200).json({
       orders
     });
