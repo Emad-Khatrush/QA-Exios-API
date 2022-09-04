@@ -27,7 +27,7 @@ const uploadToGoogleCloud = async (file, folderName) => {
     });
 
     const publicUrl = format(
-      `https://storage.cloud.google.com/${bucket.name}/${cloudFile.name}`
+      `https://storage.googleapis.com/${bucket.name}/${cloudFile.name}`
     );
     
     await blobStream.end(file.buffer);
