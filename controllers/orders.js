@@ -134,6 +134,7 @@ module.exports.createOrder = async (req, res, next) => {
       link: data.paymentLink,
       status: {
         arrived: data.arrived,
+        arrivedLibya: data.arrivedLibya,
         paid: data.paid,
       },
       deliveredPackages: {
