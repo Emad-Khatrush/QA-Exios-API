@@ -1,0 +1,5 @@
+[1023/221120.859:ERROR:cache_util_win.cc(21)] Unable to move the cache: Access is denied. (0x5)
+[1023/221120.860:ERROR:cache_util.cc(135)] Unable to move cache folder C:\Users\Emad\Desktop\Exios\exios-system\exios-api\utils\tmp\Default\Cache to C:\Users\Emad\Desktop\Exios\exios-system\exios-api\utils\tmp\Default\old_Cache_000
+[1023/221120.860:ERROR:disk_cache.cc(184)] Unable to create cache
+[1023/221121.858:ERROR:service_worker_storage.cc(2204)] Failed to delete the database: Database IO error
+[1023/221123.751:INFO:CONSOLE(1)] "Uncaught (in promise) TypeError: Partial response (status code 206) is unsupported", source: https://web.whatsapp.com/serviceworker.js (1)
