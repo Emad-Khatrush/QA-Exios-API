@@ -15,6 +15,7 @@ const expenses = require('./routes/expenses');
 const incomes = require('./routes/incomes');
 const activities = require('./routes/activities');
 const offices = require('./routes/offices');
+const sendMessages = require('./routes/sendMessages');
 
 const app = express();
 
@@ -37,6 +38,7 @@ app.use((req, res, next) => {
     
   next();
 })
+app.use(cors());
 
 const db = mongoose.connection;
 db.on("error", console.error.bind(console, "connection error:"));
@@ -51,6 +53,7 @@ app.use('/api', expenses);
 app.use('/api', activities);
 app.use('/api', offices);
 app.use('/api', incomes);
+app.use('/api', sendMessages);
 
 app.use((req, res) => {
   res.status(404).send("Page Not Found");

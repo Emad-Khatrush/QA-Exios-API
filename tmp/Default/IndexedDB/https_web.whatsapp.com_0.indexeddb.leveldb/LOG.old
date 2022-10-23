@@ -1,0 +1,75 @@
+2022/10/23-18:11:23.413 5a34 Reusing MANIFEST C:\Users\Emad\Desktop\Exios\exios-system\exios-api\tmp\Default\IndexedDB\https_web.whatsapp.com_0.indexeddb.leveldb/MANIFEST-000001
+2022/10/23-18:11:23.414 5a34 Recovering log #35
+2022/10/23-18:11:23.423 5a34 Reusing old log C:\Users\Emad\Desktop\Exios\exios-system\exios-api\tmp\Default\IndexedDB\https_web.whatsapp.com_0.indexeddb.leveldb/000035.log 
+2022/10/23-18:11:23.423 5a34 Delete type=2 #32
+2022/10/23-18:11:23.423 5a34 Delete type=2 #34
+2022/10/23-18:11:23.565 5cac Level-0 table #41: started
+2022/10/23-18:11:23.568 5cac Level-0 table #41: 77722 bytes OK
+2022/10/23-18:11:23.568 5cac Delete type=0 #35
+2022/10/23-18:11:23.569 5cac Manual compaction at level-0 from '\x00\x0c\x00\x00\x00' @ 72057594037927935 : 1 .. '\x00\x0d\x00\x00\x00' @ 0 : 0; will stop at (end)
+2022/10/23-18:11:23.569 5cac Manual compaction at level-1 from '\x00\x0c\x00\x00\x00' @ 72057594037927935 : 1 .. '\x00\x0d\x00\x00\x00' @ 0 : 0; will stop at '\x00\x0f\x05\x02\x03\x00\x00\x00\x00\x00\x00\xf0?' @ 161140 : 1
+2022/10/23-18:11:23.569 5cac Compacting 1@1 + 1@2 files
+2022/10/23-18:11:23.573 5cac Generated table #42@1: 532 keys, 22554 bytes
+2022/10/23-18:11:23.573 5cac Compacted 1@1 + 1@2 files => 22554 bytes
+2022/10/23-18:11:23.573 5cac compacted to: files[ 0 0 1 0 0 0 0 ]
+2022/10/23-18:11:23.574 5cac Delete type=2 #41
+2022/10/23-18:11:23.574 5cac Manual compaction at level-1 from '\x00\x0f\x05\x02\x03\x00\x00\x00\x00\x00\x00\xf0?' @ 161140 : 1 .. '\x00\x0d\x00\x00\x00' @ 0 : 0; will stop at (end)
+2022/10/23-18:11:23.578 5cac Level-0 table #44: started
+2022/10/23-18:11:23.578 5cac Level-0 table #44: 1536 bytes OK
+2022/10/23-18:11:23.580 5cac Delete type=2 #38
+2022/10/23-18:11:23.580 5cac Delete type=0 #40
+2022/10/23-18:11:23.580 5cac Manual compaction at level-0 from '\x00\x0f\x00\x00\x00' @ 72057594037927935 : 1 .. '\x00\x10\x00\x00\x00' @ 0 : 0; will stop at (end)
+2022/10/23-18:11:23.580 5cac Manual compaction at level-1 from '\x00\x0f\x00\x00\x00' @ 72057594037927935 : 1 .. '\x00\x10\x00\x00\x00' @ 0 : 0; will stop at '\x00\x0f\x05\x02\x03\x00\x00\x00\x00\x00\x00\xf0?' @ 162849 : 0
+2022/10/23-18:11:23.580 5cac Compacting 1@1 + 1@2 files
+2022/10/23-18:11:23.582 5cac Generated table #45@1: 450 keys, 20874 bytes
+2022/10/23-18:11:23.582 5cac Compacted 1@1 + 1@2 files => 20874 bytes
+2022/10/23-18:11:23.582 5cac compacted to: files[ 0 0 1 0 0 0 0 ]
+2022/10/23-18:11:23.582 5cac Delete type=2 #44
+2022/10/23-18:11:23.582 5cac Manual compaction at level-1 from '\x00\x0f\x05\x02\x03\x00\x00\x00\x00\x00\x00\xf0?' @ 162849 : 0 .. '\x00\x10\x00\x00\x00' @ 0 : 0; will stop at (end)
+2022/10/23-18:11:23.583 5cac Level-0 table #47: started
+2022/10/23-18:11:23.584 5cac Level-0 table #47: 506 bytes OK
+2022/10/23-18:11:23.585 5cac Delete type=2 #42
+2022/10/23-18:11:23.585 5cac Delete type=0 #43
+2022/10/23-18:11:23.585 5cac Manual compaction at level-0 from '\x00\x0e\x00\x00\x00' @ 72057594037927935 : 1 .. '\x00\x0f\x00\x00\x00' @ 0 : 0; will stop at (end)
+2022/10/23-18:11:23.585 5cac Manual compaction at level-1 from '\x00\x0e\x00\x00\x00' @ 72057594037927935 : 1 .. '\x00\x0f\x00\x00\x00' @ 0 : 0; will stop at '\x00\x0e\x02\x02\x03\x00\x00\x00\x00\x00\x00\xf0?' @ 162878 : 0
+2022/10/23-18:11:23.585 5cac Compacting 1@1 + 1@2 files
+2022/10/23-18:11:23.587 5cac Generated table #48@1: 421 keys, 20221 bytes
+2022/10/23-18:11:23.587 5cac Compacted 1@1 + 1@2 files => 20221 bytes
+2022/10/23-18:11:23.587 5cac compacted to: files[ 0 0 1 0 0 0 0 ]
+2022/10/23-18:11:23.587 5cac Delete type=2 #47
+2022/10/23-18:11:23.588 5cac Manual compaction at level-1 from '\x00\x0e\x02\x02\x03\x00\x00\x00\x00\x00\x00\xf0?' @ 162878 : 0 .. '\x00\x0f\x00\x00\x00' @ 0 : 0; will stop at (end)
+2022/10/23-18:11:23.592 5cac Level-0 table #50: started
+2022/10/23-18:11:23.594 5cac Level-0 table #50: 13000 bytes OK
+2022/10/23-18:11:23.594 5cac Delete type=2 #45
+2022/10/23-18:11:23.594 5cac Delete type=0 #46
+2022/10/23-18:11:23.595 5cac Manual compaction at level-0 from '\x00\x0d\x00\x00\x00' @ 72057594037927935 : 1 .. '\x00\x0e\x00\x00\x00' @ 0 : 0; will stop at (end)
+2022/10/23-18:11:23.595 5cac Manual compaction at level-1 from '\x00\x0d\x00\x00\x00' @ 72057594037927935 : 1 .. '\x00\x0e\x00\x00\x00' @ 0 : 0; will stop at '\x00\x0d\x06 \x03\x00\x00\x00\x00\x00\x80V@\x00\x01\x0b\x00I\x00d\x00T\x00t\x00l\x009\x000\x00D\x00a\x00y\x00s' @ 163257 : 0
+2022/10/23-18:11:23.595 5cac Compacting 1@1 + 1@2 files
+2022/10/23-18:11:23.596 5cac Generated table #51@1: 61 keys, 1227 bytes
+2022/10/23-18:11:23.596 5cac Compacted 1@1 + 1@2 files => 1227 bytes
+2022/10/23-18:11:23.596 5cac compacted to: files[ 0 0 1 0 0 0 0 ]
+2022/10/23-18:11:23.596 5cac Delete type=2 #50
+2022/10/23-18:11:23.597 5cac Manual compaction at level-1 from '\x00\x0d\x06 \x03\x00\x00\x00\x00\x00\x80V@\x00\x01\x0b\x00I\x00d\x00T\x00t\x00l\x009\x000\x00D\x00a\x00y\x00s' @ 163257 : 0 .. '\x00\x0e\x00\x00\x00' @ 0 : 0; will stop at (end)
+2022/10/23-18:11:43.738 5cac Level-0 table #53: started
+2022/10/23-18:11:43.760 5cac Level-0 table #53: 1043013 bytes OK
+2022/10/23-18:11:43.761 5cac Delete type=2 #48
+2022/10/23-18:11:43.761 5cac Delete type=0 #49
+2022/10/23-18:11:48.012 5cac Level-0 table #55: started
+2022/10/23-18:11:48.037 5cac Level-0 table #55: 1171393 bytes OK
+2022/10/23-18:11:48.037 5cac Delete type=0 #52
+2022/10/23-18:11:48.040 5cac Compacting 1@0 + 1@1 files
+2022/10/23-18:11:48.111 5cac Generated table #56@0: 43834 keys, 1546737 bytes
+2022/10/23-18:11:48.111 5cac Compacted 1@0 + 1@1 files => 1546737 bytes
+2022/10/23-18:11:48.111 5cac compacted to: files[ 0 1 1 0 0 0 0 ]
+2022/10/23-18:11:48.112 5cac Delete type=2 #55
+2022/10/23-18:11:49.943 5cac Compacting 1@1 + 1@2 files
+2022/10/23-18:11:49.984 5cac Generated table #57@1: 20786 keys, 1359375 bytes
+2022/10/23-18:11:49.984 5cac Compacted 1@1 + 1@2 files => 1359375 bytes
+2022/10/23-18:11:49.984 5cac compacted to: files[ 0 0 1 0 0 0 0 ]
+2022/10/23-18:11:49.985 5cac Delete type=2 #53
+2022/10/23-18:11:50.090 5cac Level-0 table #59: started
+2022/10/23-18:11:50.124 5cac Level-0 table #59: 1237596 bytes OK
+2022/10/23-18:11:50.125 5cac Delete type=2 #51
+2022/10/23-18:11:50.125 5cac Delete type=0 #54
+2022/10/23-18:11:50.125 5cac Delete type=2 #56
+2022/10/23-18:11:50.192 5cac Compacting 1@1 + 1@2 files
