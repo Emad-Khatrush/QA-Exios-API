@@ -2,6 +2,10 @@
   "name": "exios-api",
   "version": "1.0.0",
   "description": "",
+  "engines": {
+    "node": "14.15.3",
+    "npm": "6.14.9"
+  },
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
