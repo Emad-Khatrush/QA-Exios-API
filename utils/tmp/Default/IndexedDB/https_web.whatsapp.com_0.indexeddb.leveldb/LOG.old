@@ -1,3 +1,11 @@
-2022/10/23-22:10:42.099 159c Reusing MANIFEST C:\Users\Emad\Desktop\Exios\exios-system\exios-api\utils\tmp\Default\IndexedDB\https_web.whatsapp.com_0.indexeddb.leveldb/MANIFEST-000001
-2022/10/23-22:10:42.099 159c Recovering log #3
-2022/10/23-22:10:42.111 159c Reusing old log C:\Users\Emad\Desktop\Exios\exios-system\exios-api\utils\tmp\Default\IndexedDB\https_web.whatsapp.com_0.indexeddb.leveldb/000003.log 
+2022/10/24-12:36:57.689 3e9c Reusing MANIFEST C:\Users\Emad\Desktop\Exios\exios-system\exios-api\utils\tmp\Default\IndexedDB\https_web.whatsapp.com_0.indexeddb.leveldb/MANIFEST-000001
+2022/10/24-12:36:57.690 3e9c Recovering log #33
+2022/10/24-12:36:57.727 3e9c Reusing old log C:\Users\Emad\Desktop\Exios\exios-system\exios-api\utils\tmp\Default\IndexedDB\https_web.whatsapp.com_0.indexeddb.leveldb/000033.log 
+2022/10/24-12:37:15.245 2570 Level-0 table #39: started
+2022/10/24-12:37:15.296 2570 Level-0 table #39: 1277089 bytes OK
+2022/10/24-12:37:15.297 2570 Delete type=0 #33
+2022/10/24-12:37:15.310 2570 Compacting 1@1 + 2@2 files
+2022/10/24-12:37:15.437 2570 Generated table #40@1: 40576 keys, 2254513 bytes
+2022/10/24-12:37:15.483 2570 Generated table #41@1: 24674 keys, 1819225 bytes
+2022/10/24-12:37:15.483 2570 Compacted 1@1 + 2@2 files => 4073738 bytes
+2022/10/24-12:37:15.484 2570 compacted to: files[ 0 0 2 0 0 0 0 ]

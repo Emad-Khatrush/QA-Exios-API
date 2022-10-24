@@ -1,3 +1,6 @@
-2022/10/23-22:11:13.246 5dec Reusing MANIFEST C:\Users\Emad\Desktop\Exios\exios-system\exios-api\utils\tmp\Default\IndexedDB\https_web.whatsapp.com_0.indexeddb.leveldb/MANIFEST-000001
-2022/10/23-22:11:13.247 5dec Recovering log #3
-2022/10/23-22:11:13.266 5dec Reusing old log C:\Users\Emad\Desktop\Exios\exios-system\exios-api\utils\tmp\Default\IndexedDB\https_web.whatsapp.com_0.indexeddb.leveldb/000003.log 
+2022/10/24-12:37:37.513 4948 Reusing MANIFEST C:\Users\Emad\Desktop\Exios\exios-system\exios-api\utils\tmp\Default\IndexedDB\https_web.whatsapp.com_0.indexeddb.leveldb/MANIFEST-000001
+2022/10/24-12:37:37.513 4948 Recovering log #38
+2022/10/24-12:37:37.528 4948 Reusing old log C:\Users\Emad\Desktop\Exios\exios-system\exios-api\utils\tmp\Default\IndexedDB\https_web.whatsapp.com_0.indexeddb.leveldb/000038.log 
+2022/10/24-12:37:37.528 4948 Delete type=2 #35
+2022/10/24-12:37:37.528 4948 Delete type=2 #36
+2022/10/24-12:37:37.528 4948 Delete type=2 #39
