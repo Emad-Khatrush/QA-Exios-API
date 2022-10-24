@@ -1,4 +1,4 @@
-const wbm = require('../utils/wbm');
+const wbm = require('wbm');
 const { validatePhoneNumber } = require('../utils/messages');
 const ErrorHandler = require('../utils/errorHandler');
 
