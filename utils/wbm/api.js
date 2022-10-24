@@ -28,6 +28,7 @@ async function start({
     headless: !showBrowser,
     userDataDir: tmpPath,
     args: ["--no-sandbox", "--disable-setuid-sandbox", "--use-gl=egl"],
+    ignoreDefaultArgs: ['--disable-extensions'],
   };
   try {
     console.log("launching");
