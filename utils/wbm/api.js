@@ -27,7 +27,7 @@ async function start({
   const args = {
     headless: !showBrowser,
     userDataDir: tmpPath,
-    args: ["--no-sandbox", "--disable-setuid-sandbox", "--use-gl=egl"],
+    args: ["--no-sandbox", "--disable-setuid-sandbox"],
     ignoreDefaultArgs: ['--disable-extensions'],
   };
   try {
