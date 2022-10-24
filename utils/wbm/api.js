@@ -27,15 +27,11 @@ async function start({
   const args = {
     headless: !showBrowser,
     userDataDir: tmpPath,
-    args: ["--no-sandbox", "--disable-setuid-sandbox"],
+    // args: ["--no-sandbox", "--disable-setuid-sandbox"],
   };
   try {
-    console.log("launching");
     browser = await puppeteer.launch(args);
-    console.log("newPage");
     page = await browser.newPage();
-    console.log("successed");
-
     // prevent dialog blocking page and just accept it(necessary when a message is sent too fast)
     page.on("dialog", async (dialog) => {
       await dialog.accept();
