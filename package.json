@@ -27,6 +27,7 @@
     "multer-storage-cloudinary": "^4.0.0",
     "order-id": "^2.1.2",
     "os": "^0.1.2",
+    "puppeteer": "^19.1.0",
     "streamifier": "^0.1.1",
     "util": "^0.12.4",
     "uuid": "^8.3.2",
