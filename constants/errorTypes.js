@@ -5,6 +5,7 @@ exports.errorMessages = {
   INVALID_CREDENTIALS: 'invalid-credentials',
   TOKEN_NOT_FOUND: 'token-not-found',
   INVALID_TOKEN: 'invalid-token',
+  USER_SUBSCRIPTION_CANCLED: 'user-subscription-canceled',
   // order errors
   ORDER_ID_TAKEN: 'order-id-taken',
   ORDER_NOT_FOUND: 'order-not-found',

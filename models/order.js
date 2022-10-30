@@ -174,6 +174,14 @@ const orderSchema = new Schema({
         type: Number,
         default: 0
       },
+      receivedShipmentLYD: {
+        type: Number,
+        default: 0
+      },
+      receivedShipmentUSD: {
+        type: Number,
+        default: 0
+      },
     }
   }]
 }, { timestamps: true })

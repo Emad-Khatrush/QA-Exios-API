@@ -1,6 +1,7 @@
 const jwt = require('jsonwebtoken');
 const ErrorHandler = require('../utils/errorHandler');
 const User = require('../models/user');
+const { errorMessages } = require('../constants/errorTypes');
 
 exports.protect = async (req, res, next) => {
   let token;
@@ -18,6 +19,10 @@ exports.protect = async (req, res, next) => {
 
     if (!user) {
       return next(new ErrorHandler(404, 'user-not-found'));
+    }
+
+    if (user.isCanceled) {
+      return next(new ErrorHandler(400, errorMessages.USER_SUBSCRIPTION_CANCLED));
     }
 
     req.user = user;

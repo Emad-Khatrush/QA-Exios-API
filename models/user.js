@@ -29,6 +29,10 @@ const userSchema = new Schema({
   imgUrl: {
     type: String,
   },
+  isCanceled: {
+    type: Boolean,
+    default: false,
+  },
   orders: [{
     type: Schema.Types.ObjectId,
     ref: "Order",

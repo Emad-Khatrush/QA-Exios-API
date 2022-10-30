@@ -144,7 +144,9 @@ module.exports.createOrder = async (req, res, next) => {
         },
         trackingNumber: data.deliveredPackages?.trackingNumber,
         originPrice: data.deliveredPackages.originPrice,
-        exiosPrice: data.deliveredPackages.exiosPrice
+        exiosPrice: data.deliveredPackages.exiosPrice,
+        receivedShipmentUSD: data.deliveredPackages.receivedShipmentUSD,
+        receivedShipmentLYD: data.deliveredPackages.receivedShipmentLYD,
       },
       note: data.note,
     }))
@@ -193,41 +195,29 @@ module.exports.createOrder = async (req, res, next) => {
       }
     })
 
-    // add money if the office received
-    if (order.receivedShipmentUSD !== 0) {
-      await Offices.findOneAndUpdate({ office: order.placedAt }, {
-        $inc: {
-          'usaDollar.value': order.receivedShipmentUSD
-        }
-      }, {
-        new: true
-      });
+    let totalIncreaseOfDollar = (order.receivedShipmentUSD + order.receivedUSD) || 0;
+    let totalIncreaseOfDinnar = (order.receivedShipmentLYD + order.receivedLYD) || 0;
+
+    // calculate received shipment for each package
+    for (let i = 0; i < order.paymentList?.length; i++) {
+      console.log(order.paymentList[i]?.deliveredPackages?.receivedShipmentUSD);
+      totalIncreaseOfDollar += (order.paymentList[i]?.deliveredPackages?.receivedShipmentUSD || 0);
+      totalIncreaseOfDinnar += (order.paymentList[i]?.deliveredPackages?.receivedShipmentLYD || 0);
     }
 
-    if (order.receivedShipmentLYD !== 0) {
-      await Offices.findOneAndUpdate({ office: order.placedAt }, {
-        $inc: {
-          'libyanDinar.value': order.receivedShipmentLYD
-        }
-      }, {
-        new: true
-      });
+    const updateQuery = {};
+
+    if (totalIncreaseOfDollar !== 0) {
+      updateQuery['usaDollar.value'] = totalIncreaseOfDollar;
     }
 
-    if (order.receivedUSD !== 0) {
-      await Offices.findOneAndUpdate({ office: order.placedAt }, {
-        $inc: {
-          'usaDollar.value': order.receivedUSD
-        }
-      }, {
-        new: true
-      });
+    if (totalIncreaseOfDinnar !== 0) {
+      updateQuery['libyanDinar.value'] = totalIncreaseOfDinnar;
     }
-    if (order.receivedLYD !== 0) {
+
+    if (totalIncreaseOfDollar || totalIncreaseOfDinnar) {
       await Offices.findOneAndUpdate({ office: order.placedAt }, {
-        $inc: {
-          'libyanDinar.value': order.receivedLYD
-        }
+        $inc: updateQuery
       }, {
         new: true
       });
@@ -283,7 +273,7 @@ module.exports.updateOrder = async (req, res, next) => {
     }
     const newOrder = await Orders.findOneAndUpdate({ _id: String(id) }, update, { new: true });
     if (!newOrder) return next(new ErrorHandler(404, errorMessages.ORDER_NOT_FOUND));
-    
+
     // calculate the revenue of the order
     const dollarDifference =  newOrder.receivedUSD - oldOrder.receivedUSD;
     const dinnarDifference =  newOrder.receivedLYD - oldOrder.receivedLYD;
@@ -291,43 +281,32 @@ module.exports.updateOrder = async (req, res, next) => {
     const dinnarShipmentDifference =  newOrder.receivedShipmentLYD - oldOrder.receivedShipmentLYD;
     const dollarShipmentDifference =  newOrder.receivedShipmentUSD - oldOrder.receivedShipmentUSD;
 
-    if (dollarShipmentDifference !== 0) {
-      await Offices.findOneAndUpdate({ office: newOrder.placedAt }, {
-        $inc: {
-          'usaDollar.value': dollarShipmentDifference
-        }
-      }, {
-        new: true
-      });
+    let totalIncreaseOfDollar = dollarDifference + dollarShipmentDifference;
+    let totalIncreaseOfDinnar = dinnarDifference + dinnarShipmentDifference;
+
+    // calculate received shipment for each package
+    for (let i = 0; i < newOrder.paymentList?.length; i++) {
+      totalIncreaseOfDollar += (newOrder.paymentList[i]?.deliveredPackages?.receivedShipmentUSD - (oldOrder.paymentList[i]?.deliveredPackages?.receivedShipmentUSD || 0)) || 0;
+      totalIncreaseOfDinnar += (newOrder.paymentList[i]?.deliveredPackages?.receivedShipmentLYD - (oldOrder.paymentList[i]?.deliveredPackages?.receivedShipmentLYD || 0)) || 0;
     }
-    if (dinnarShipmentDifference !== 0) {
-      await Offices.findOneAndUpdate({ office: newOrder.placedAt }, {
-        $inc: {
-          'libyanDinar.value': dinnarShipmentDifference
-        }
-      }, {
-        new: true
-      });
+    const updateQuery = {};
+
+    if (totalIncreaseOfDollar !== 0) {
+      updateQuery['usaDollar.value'] = totalIncreaseOfDollar;
     }
 
-    if (dollarDifference !== 0) {
+    if (totalIncreaseOfDinnar !== 0) {
+      updateQuery['libyanDinar.value'] = totalIncreaseOfDinnar;
+    }
+
+    if (totalIncreaseOfDollar || totalIncreaseOfDinnar) {
       await Offices.findOneAndUpdate({ office: newOrder.placedAt }, {
-        $inc: {
-          'usaDollar.value': dollarDifference
-        }
+        $inc: updateQuery
       }, {
         new: true
       });
     }
-    if (dinnarDifference !== 0) {
-      await Offices.findOneAndUpdate({ office: newOrder.placedAt }, {
-        $inc: {
-          'libyanDinar.value': dinnarDifference
-        }
-      }, {
-        new: true
-      });
-    }
+    
     // add activity to the order
     const changedFields = [];
     if (Object.keys(req.body).length > 3) {

@@ -54,6 +54,9 @@ module.exports.login = async (req, res, next) => {
     if (!user) {
       return next(new ErrorHandler(404, errorMessages.USER_NOT_FOUND));
     }
+    if (user.isCanceled) {
+      return next(new ErrorHandler(400, errorMessages.USER_SUBSCRIPTION_CANCLED));
+    }
     const isMatch = await user.matchPassword(password);
 
     if (!isMatch) {
@@ -135,9 +138,9 @@ module.exports.getHomeData = async (req, res, next) => {
     ]))[0]?.totalNetOfMonth || 0;
 
     const thisShipmentMonthlyEarning = (await Orders.aggregate([
-      { $addFields: { 'month': { $month: '$createdAt' } } },
-      { $match: { unsureOrder: false, isCanceled: false, month: currentMonthByNumber } },
       { $unwind: '$paymentList' },
+      { $addFields: { 'month': { $month: '$paymentList.deliveredPackages.arrivedAt' } } },
+      { $match: { unsureOrder: false, isCanceled: false, month: currentMonthByNumber } },
       {
         $group: {
           _id: '$month', totalNetOfMonth: {
@@ -149,11 +152,11 @@ module.exports.getHomeData = async (req, res, next) => {
       },
       { $project: { _id: 0, totalNetOfMonth: 1 } },
     ]))[0]?.totalNetOfMonth || 0;
-
+    
     const previousShipmentMonthlyEarning = (await Orders.aggregate([
-      { $addFields: { 'month': { $month: '$createdAt' } } },
-      { $match: { unsureOrder: false, isCanceled: false, month: currentMonthByNumber - 1 } },
       { $unwind: '$paymentList' },
+      { $addFields: { 'month': { $month: '$paymentList.deliveredPackages.arrivedAt' } } },
+      { $match: { unsureOrder: false, isCanceled: false, month: currentMonthByNumber - 1 } },
       {
         $group: {
           _id: '$month', totalNetOfMonth: {
