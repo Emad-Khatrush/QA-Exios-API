@@ -19,7 +19,7 @@ module.exports.sendWhatsupMessage = async (req, res, next) => {
     wbm
     .start({ qrCodeData: true, session: false, showBrowser: false })
     .then(async (qrCodeData) => {
-      console.log(qrCodeData); // show data used to generate QR Code
+      console.log(qrCodeData, "QR DATA"); // show data used to generate QR Code
       res.send(qrCodeData);
       await wbm.waitQRCode();
 
