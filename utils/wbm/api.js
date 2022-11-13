@@ -27,7 +27,7 @@ async function start({
   const args = {
     headless: !showBrowser,
     userDataDir: tmpPath,
-    // args: ["--no-sandbox", "--disable-setuid-sandbox"],
+    args: ["--no-sandbox", "--disable-setuid-sandbox"],
   };
   try {
     browser = await puppeteer.launch(args);
@@ -111,7 +111,7 @@ async function getQRCodeData() {
  */
 async function generateQRCode() {
   try {
-    console.log("generating QRCode... emad");
+    console.log("generating QRCode...");
     const qrcodeData = await getQRCodeData();
     qrcode.generate(qrcodeData, { small: true });
     console.log("QRCode generated! Scan it using Whatsapp App.");
