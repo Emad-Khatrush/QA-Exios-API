@@ -23,7 +23,8 @@ module.exports.sendWhatsupMessage = async (req, res, next) => {
       res.send(qrCodeData);
       await wbm.waitQRCode();
 
-      const phones = [phone];
+      const receiver = validatePhoneNumber(phone);
+      const phones = [receiver];
 
       await wbm.send(phones, message);
       await wbm.end();
