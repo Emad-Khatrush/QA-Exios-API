@@ -1,0 +1,4 @@
+2022/12/22-23:56:15.894 1b6c Log #3: 3 ops saved to Table #4 OK
+2022/12/22-23:56:16.904 1b6c Archiving C:\Users\Emad\Desktop\Exios\exios-system\exios-api\utils\tmp\Default\File System\Origins/000003.log: IO error: C:\Users\Emad\Desktop\Exios\exios-system\exios-api\utils\tmp\Default\File System\Origins/000003.log: Could not rename file: File currently in use. (ChromeMethodBFE: 14::RenameFile::2)
+2022/12/22-23:56:16.904 1b6c Table #4: 3 entries OK
+2022/12/22-23:56:17.917 1b6c Archiving C:\Users\Emad\Desktop\Exios\exios-system\exios-api\utils\tmp\Default\File System\Origins/MANIFEST-000001: IO error: C:\Users\Emad\Desktop\Exios\exios-system\exios-api\utils\tmp\Default\File System\Origins/MANIFEST-000001: Could not rename file: File currently in use. (ChromeMethodBFE: 14::RenameFile::2)

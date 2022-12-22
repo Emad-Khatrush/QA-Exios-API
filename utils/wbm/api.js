@@ -19,6 +19,7 @@ async function start({
   showBrowser = false,
   qrCodeData = false,
   session = true,
+  sendMessage = false
 } = {}) {
   if (!session) {
     deleteSession(tmpPath);
@@ -44,18 +45,18 @@ async function start({
     page.setDefaultTimeout(60000);
 
     await page.goto("https://web.whatsapp.com");
-    if (session && (await isAuthenticated())) {
+    if (sendMessage) {
       return;
+    }
+    if (qrCodeData) {
+      console.log("Getting QRCode data...");
+      console.log(
+        "Note: You should use wbm.waitQRCode() inside wbm.start() to avoid errors."
+      );
+      return await getQRCodeData();
     } else {
-      if (qrCodeData) {
-        console.log("Getting QRCode data...");
-        console.log(
-          "Note: You should use wbm.waitQRCode() inside wbm.start() to avoid errors."
-        );
-        return await getQRCodeData();
-      } else {
-        await generateQRCode();
-      }
+      const data = await generateQRCode();
+      return data;
     }
   } catch (err) {
     deleteSession(tmpPath);
@@ -113,8 +114,9 @@ async function generateQRCode() {
   try {
     console.log("generating QRCode...");
     const qrcodeData = await getQRCodeData();
-    qrcode.generate(qrcodeData, { small: true });
+    // qrcode.generate(qrcodeData, { small: true });
     console.log("QRCode generated! Scan it using Whatsapp App.");
+    return await qrcodeData;
   } catch (err) {
     throw await QRCodeExeption(
       "QR Code can't be generated(maybe your connection is too slow)."
@@ -167,7 +169,7 @@ async function sendTo(phoneOrContact, message) {
     );
     await page.waitForSelector("div#startup", { hidden: true, timeout: 60000 });
     await sleep(1000);
-    await page.waitForSelector(".selectable-text", { timeout: 30000 });
+    await page.waitForSelector(".selectable-text", { timeout: 30000 }),
     await sleep(1000);
     await page.click('span[data-icon="send"]', {
       hidden: true,
@@ -180,6 +182,9 @@ async function sendTo(phoneOrContact, message) {
     console.error(err);
     console.log(`${phone} Failed\n`);
     counter.fails++;
+    throw {
+      message: 'not worked'
+    }
   }
 }
 

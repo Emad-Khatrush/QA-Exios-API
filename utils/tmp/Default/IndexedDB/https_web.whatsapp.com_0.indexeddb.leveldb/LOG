@@ -1,6 +1,26 @@
-2022/11/13-13:25:34.692 bb0 Creating DB C:\Users\Emad\Desktop\Exios\exios-system\exios-api\utils\tmp\Default\IndexedDB\https_web.whatsapp.com_0.indexeddb.leveldb since it was missing.
-2022/11/13-13:25:34.696 bb0 Reusing MANIFEST C:\Users\Emad\Desktop\Exios\exios-system\exios-api\utils\tmp\Default\IndexedDB\https_web.whatsapp.com_0.indexeddb.leveldb/MANIFEST-000001
-2022/11/13-13:25:34.802 4318 Level-0 table #5: started
-2022/11/13-13:25:34.803 4318 Level-0 table #5: 7353 bytes OK
-2022/11/13-13:25:34.804 4318 Delete type=0 #3
-2022/11/13-13:25:34.805 4318 Manual compaction at level-0 from '\x00\x01\x00\x00\x00' @ 72057594037927935 : 1 .. '\x00\x02\x00\x00\x00' @ 0 : 0; will stop at (end)
+2022/12/22-23:56:35.956 2be4 Reusing MANIFEST C:\Users\Emad\Desktop\Exios\exios-system\exios-api\utils\tmp\Default\IndexedDB\https_web.whatsapp.com_0.indexeddb.leveldb/MANIFEST-000001
+2022/12/22-23:56:35.957 2be4 Recovering log #862
+2022/12/22-23:56:36.139 2be4 Reusing old log C:\Users\Emad\Desktop\Exios\exios-system\exios-api\utils\tmp\Default\IndexedDB\https_web.whatsapp.com_0.indexeddb.leveldb/000862.log 
+2022/12/22-23:56:36.139 2be4 Delete type=2 #857
+2022/12/22-23:56:36.139 2be4 Delete type=2 #858
+2022/12/22-23:56:36.139 2be4 Delete type=2 #859
+2022/12/22-23:56:36.139 2be4 Delete type=2 #860
+2022/12/22-23:56:36.139 2be4 Delete type=2 #861
+2022/12/22-23:56:36.139 2be4 Delete type=2 #863
+2022/12/22-23:56:36.416 5200 Level-0 table #871: started
+2022/12/22-23:56:36.466 5200 Level-0 table #871: 1246352 bytes OK
+2022/12/22-23:56:36.467 5200 Delete type=0 #862
+2022/12/22-23:56:46.575 5200 Compacting 1@1 + 5@2 files
+2022/12/22-23:56:46.741 5200 Generated table #872@1: 36308 keys, 2219612 bytes
+2022/12/22-23:56:46.759 5200 Generated table #873@1: 2614 keys, 2148548 bytes
+2022/12/22-23:56:46.824 5200 Generated table #874@1: 11855 keys, 2164800 bytes
+2022/12/22-23:56:46.904 5200 Generated table #875@1: 39740 keys, 2230562 bytes
+2022/12/22-23:56:46.937 5200 Generated table #876@1: 34790 keys, 835882 bytes
+2022/12/22-23:56:46.937 5200 Compacted 1@1 + 5@2 files => 9599404 bytes
+2022/12/22-23:56:46.937 5200 compacted to: files[ 0 0 5 0 0 0 0 ]
+2022/12/22-23:56:46.938 5200 Delete type=2 #864
+2022/12/22-23:56:46.938 5200 Delete type=2 #865
+2022/12/22-23:56:46.938 5200 Delete type=2 #866
+2022/12/22-23:56:46.938 5200 Delete type=2 #867
+2022/12/22-23:56:46.938 5200 Delete type=2 #868
+2022/12/22-23:56:46.938 5200 Delete type=2 #871
