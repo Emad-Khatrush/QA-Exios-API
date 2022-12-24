@@ -1,2 +1,0 @@
-2022/12/24-18:33:24.401 525c Reusing MANIFEST C:\Users\Emad\Desktop\Exios\exios-system\exios-api\utils\tmp\Default\IndexedDB\https_web.whatsapp.com_0.indexeddb.leveldb/MANIFEST-000001
-2022/12/24-18:33:24.467 12a0 Manual compaction at level-0 from '\x00\x01\x00\x00\x00' @ 72057594037927935 : 1 .. '\x00\x02\x00\x00\x00' @ 0 : 0; will stop at (end)

@@ -30,7 +30,7 @@
     "multer-storage-cloudinary": "^4.0.0",
     "order-id": "^2.1.2",
     "os": "^0.1.2",
-    "puppeteer": "^7.0.1",
+    "puppeteer": "^19.1.0",
     "util": "^0.12.4",
     "uuid": "^8.3.2",
     "wbm": "^1.1.16"

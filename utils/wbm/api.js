@@ -29,6 +29,7 @@ async function start({
     headless: !showBrowser,
     userDataDir: tmpPath,
     args: ["--no-sandbox", "--disable-setuid-sandbox"],
+    product: 'firefox'
   };
   try {
     browser = await puppeteer.launch(args);
