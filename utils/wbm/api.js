@@ -26,9 +26,7 @@ async function start({
   }
 
   const args = {
-    headless: !showBrowser,
-    userDataDir: tmpPath,
-    args: ["--no-sandbox", "--disable-setuid-sandbox"],
+    args: ["--no-sandbox"],
     product: 'firefox'
   };
   try {
