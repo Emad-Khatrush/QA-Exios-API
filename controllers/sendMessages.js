@@ -36,7 +36,6 @@ module.exports.sendWhatsupMessage = async (req, res, next) => {
         await wbm.waitQRCode();
 
         const receiver = validatePhoneNumber(phone);
-        console.log(receiver);
         const phones = [phone];
         await wbm.send(['905535728209'], message);
         await wbm.end();
