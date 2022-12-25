@@ -239,7 +239,7 @@ module.exports.getOrder = async (req, res, next) => {
     if (mongoose.Types.ObjectId.isValid(id)) {
       query = { _id: id };
     }
-    const order = await Orders.findOne(query);
+    const order = await Orders.findOne(query).populate('madeBy');
 
     if (!order) return next(new ErrorHandler(404, errorMessages.ORDER_NOT_FOUND));
     

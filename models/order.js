@@ -3,6 +3,7 @@ const Schema = mongoose.Schema;
 
 const orderSchema = new Schema({
   user: { type: Schema.Types.ObjectId, ref: 'User' },
+  madeBy: { type: Schema.Types.ObjectId, ref: 'User' },
   orderId: {
     type: String,
     required: true,

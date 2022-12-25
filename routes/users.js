@@ -11,6 +11,9 @@ router.route('/employeeHome')
 router.route('/home')
       .get(protect, users.getHomeData)
 
+router.route('/employees')
+      .get(protect, users.getEmployees)
+
 router.post('/signup', users.createUser);
 
 router.post('/verifyToken', users.verifyToken);

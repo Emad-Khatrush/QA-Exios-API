@@ -42,6 +42,25 @@ module.exports.createUser = async (req, res) => {
   }
 }
 
+module.exports.getEmployees = async (req, res, next) => {
+  try {
+    let query = [{ $match: {
+      $or: [{ 'roles.isAdmin': true }, { 'roles.isEmployee': true }]
+    }},
+    {
+      $match: {
+        $or: [{ isCanceled: false }, { isCanceled: undefined }]
+      }
+    }
+  ];
+    const employees = await User.aggregate(query);
+    res.status(200).json({ results: employees });
+  } catch (error) {
+    console.log(error);
+    return next(new ErrorHandler(404, errorMessages.SERVER_ERROR));
+  }
+}
+
 module.exports.login = async (req, res, next) => {
   const { username, password } = req.body;
 
