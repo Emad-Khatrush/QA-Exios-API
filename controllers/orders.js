@@ -11,7 +11,7 @@ const mongoose = require('mongoose');
 
 module.exports.getInvoices = async (req, res, next) => {
   try {
-    const orders = await Orders.find({}).populate('user');
+    const orders = await Orders.find({}).populate(['user', 'madeBy']);
     res.status(200).json({
       orders
     });
@@ -352,8 +352,8 @@ module.exports.createUnsureOrder = async (req, res, next) => {
       },
       placedAt: req.body.placedAt,
       shipment: {
-        fromWhere: '.',
-        toWhere: '.',
+        fromWhere: req.body.fromWhere,
+        toWhere: req.body.toWhere,
         method: req.body.method
       },
       isShipment: true,
