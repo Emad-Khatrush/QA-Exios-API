@@ -143,6 +143,10 @@ const orderSchema = new Schema({
         type: Boolean,
         default: false
       },
+      received: {
+        type: Boolean,
+        default: false
+      }
     },
     note: {
       type: String,

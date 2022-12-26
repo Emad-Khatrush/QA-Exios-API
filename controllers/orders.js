@@ -136,6 +136,7 @@ module.exports.createOrder = async (req, res, next) => {
         arrived: data.arrived,
         arrivedLibya: data.arrivedLibya,
         paid: data.paid,
+        received: data.received
       },
       deliveredPackages: {
         weight: {
