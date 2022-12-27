@@ -40,6 +40,9 @@ router.route('/order/:id')
       .get(orders.getOrder)
       .put(protect, orders.updateOrder);
 
+router.route('/order/:id/cancel')
+      .post(protect, orders.cancelOrder);
+
 router.route('/order/:id/addActivity')
       .post(protect, orders.createOrderActivity)
 

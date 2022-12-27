@@ -112,6 +112,15 @@ const orderSchema = new Schema({
     type: Boolean,
     default: false,
   },
+  cancelation: {
+    date: {
+      type: Date,
+      default: Date.now
+    },
+    reason: {
+      type: String
+    }
+  },
   images: [{
     filename: String,
     path: String,

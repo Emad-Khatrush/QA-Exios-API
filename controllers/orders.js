@@ -251,6 +251,34 @@ module.exports.getOrder = async (req, res, next) => {
   }
 }
 
+module.exports.cancelOrder = async (req, res, next) => {
+  const id = req.params.id;
+  if (!id) return next(new ErrorHandler(404, errorMessages.ORDER_NOT_FOUND));
+
+  try {
+    let query = { orderId : String(id) };
+    if (mongoose.Types.ObjectId.isValid(id)) {
+      query = { _id: id };
+    }
+
+    const updateQuery = {
+      isCanceled: true,
+      cancelation: {
+        reason: req.body.cancelationReason
+      }
+    }
+
+    const order = await Orders.findOneAndUpdate(query, updateQuery, { new: true }).populate('madeBy');
+
+    if (!order) return next(new ErrorHandler(404, errorMessages.ORDER_NOT_FOUND));
+    
+    res.status(200).json(order);
+  } catch (error) {
+    console.log(error);
+    return next(new ErrorHandler(404, error.message));
+  }
+}
+
 module.exports.updateOrder = async (req, res, next) => {
   const id = req.params.id;
   if (!id) return next(new ErrorHandler(404, errorMessages.ORDER_NOT_FOUND));
