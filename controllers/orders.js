@@ -27,7 +27,7 @@ module.exports.getOrders = async (req, res, next) => {
     const tabTypeQuery = getTapTypeQuery(tabType);
     tabTypeQuery.isCanceled = false;
     const orders = await Orders.find(tabTypeQuery).populate('user').sort({ createdAt: -1 }).skip(skip).limit(limit);
-    const allOrders = await Orders.find({});
+    const allOrders = await Orders.find({ isCanceled: false });
     const totalOrders = allOrders.length;
 
     let activeOrders = 0, arrivingOrders = 0, shipmentOrders = 0, unpaidOrders = 0, finishedOrders = 0, unsureOrders = 0;
