@@ -25,6 +25,7 @@ module.exports.getOrders = async (req, res, next) => {
     const { limit, skip, tabType } = req.query;
     // await Orders.deleteMany({})
     const tabTypeQuery = getTapTypeQuery(tabType);
+    tabTypeQuery.isCanceled = false;
     const orders = await Orders.find(tabTypeQuery).populate('user').sort({ createdAt: -1 }).skip(skip).limit(limit);
     const allOrders = await Orders.find({});
     const totalOrders = allOrders.length;
@@ -64,6 +65,7 @@ module.exports.getOrdersTab = async (req, res, next) => {
     const { limit, skip, tabType } = req.query;
     // await Orders.deleteMany({})
     const tabTypeQuery = getTapTypeQuery(tabType);
+    tabTypeQuery.isCanceled = false;
     const orders = await Orders.find(tabTypeQuery).populate('user').sort({ createdAt: -1 }).skip(skip).limit(limit);
     const totalOrders = await Orders.count();
     
