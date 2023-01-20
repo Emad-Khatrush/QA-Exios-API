@@ -8,6 +8,7 @@ const Offices = require('../models/office');
 const { addChangedField, getTapTypeQuery } = require('../middleware/helper');
 const { orderLabels } = require('../constants/orderLabels');
 const mongoose = require('mongoose');
+const order = require('../models/order');
 
 module.exports.getInvoices = async (req, res, next) => {
   try {
@@ -364,6 +365,25 @@ module.exports.updateOrder = async (req, res, next) => {
   }
 }
 
+module.exports.getPackagesOfOrders = async (req, res, next) => {
+  try {
+    let packages = await Orders.aggregate([
+      {
+        $match: { isCanceled: false }
+      },
+      {
+        $unwind: '$paymentList'
+      }
+    ]);
+    packages = await Orders.populate(packages, { path: "madeBy" });
+
+    res.status(200).send(packages);
+  } catch (error) {
+    console.log(error);
+    return next(new ErrorHandler(400, error.message));
+  }
+}
+
 module.exports.createUnsureOrder = async (req, res, next) => {
   try {
     if (!req.body) {
@@ -497,6 +517,141 @@ module.exports.createOrderActivity = async (req, res, next) => {
         actionId: order._id
       }
     })
+    res.status(200).json(order);
+  } catch (error) {
+    console.log(error);
+    return next(new ErrorHandler(404, error.message));
+  }
+}
+
+// Client Interface Controllers
+module.exports.getClientHomeData = async (req, res, next) => {
+  try {
+    const orders = await Orders.find({ user: req.user._id, isCanceled: false });
+    let receivedOrders = 0;
+    let readyForReceivement = 0;
+    let totalPaidInvoices = 0;
+    let activeOrders = 0;
+
+    orders.forEach((order) => {
+      if (order.isCanceled) return;
+
+      totalPaidInvoices += order.totalInvoice;
+      if (order.isFinished) {
+        receivedOrders++;
+      }
+      if (!order.isFinished) {
+        activeOrders++;
+      }
+      if ((order.isPayment && order.orderStatus === 4) || (!order.isPayment && order.orderStatus === 3)) {
+        readyForReceivement++;
+      }
+    })
+
+    res.status(200).json({
+      results: {
+        countList: {
+          receivedOrders,
+          readyForReceivement,
+          totalPaidInvoices,
+          activeOrders
+        }
+      }
+    });
+  } catch (error) {
+    console.log(error);
+    return next(new ErrorHandler(404, error.message));
+  }
+}
+
+module.exports.getOrdersForUser = async (req, res, next) => {
+  try {
+    const { id, type } = req.params;
+
+    let orders;
+    if (type === 'all') {
+      orders = await Orders.find({ user: id, isCanceled: false });
+    } else {
+      const queryType = getTapTypeQuery(type);
+      orders = await Orders.find({ ...queryType, user: id, isCanceled: false});
+    }
+    let finishedOrders = 0;
+    let readyForReceivement = 0;
+    let warehouseArrived = 0;
+    let activeOrders = 0;
+
+    orders.forEach((order) => {
+      if (order.isCanceled) return;
+
+      if (order.isFinished) {
+        finishedOrders++;
+      }
+      if (!order.isFinished) {
+        activeOrders++;
+      }
+      if ((order.isPayment && order.orderStatus === 2) || (!order.isPayment && order.orderStatus === 1)) {
+        warehouseArrived++;
+      }
+      if ((order.isPayment && order.orderStatus === 4) || (!order.isPayment && order.orderStatus === 3)) {
+        readyForReceivement++;
+      }
+    })
+
+    res.status(200).json({
+      results: {
+        orders,
+        countList: {
+          finishedOrders,
+          readyForReceivement,
+          warehouseArrived,
+          activeOrders
+        }
+      }
+    });
+  } catch (error) {
+    console.log(error);
+    return next(new ErrorHandler(404, error.message));
+  }
+}
+
+module.exports.getOrdersClientBySearch= async (req, res, next) => {
+  const { value } = req.params;
+
+  let query = [
+    { $match: { $or: [ {orderId: { $regex: new RegExp(value.toLowerCase(), 'i') }, user: req.user._id}, { 'paymentList.deliveredPackages.trackingNumber': { $regex: new RegExp(value.trim().toLowerCase(), 'i') }, user: req.user._id }, { 'customerInfo.fullName': { $regex: new RegExp(value.toLowerCase(), 'i') }, user: req.user._id } ] } }
+  ]
+
+  if (value === '') {
+    query = [
+      { $match: { user: req.user._id, isCanceled: false } }
+    ]
+  }
+
+  try {
+    const orders = await Orders.aggregate(query);
+    res.status(200).json({
+      results: {
+        orders
+      }
+    })
+  } catch (error) {
+    return next(new ErrorHandler(404, error.message));
+  }
+}
+
+module.exports.getClientOrder = async (req, res, next) => {
+  const id = req.params.id;
+  if (!id) return next(new ErrorHandler(404, errorMessages.ORDER_NOT_FOUND));
+
+  try {
+    let query = { orderId : String(id), user: req.user._id };
+    if (mongoose.Types.ObjectId.isValid(id)) {
+      query = { _id: id, user: req.user._id };
+    }
+    const order = await Orders.findOne(query);
+
+    if (!order) return next(new ErrorHandler(404, errorMessages.ORDER_NOT_FOUND));
+    
     res.status(200).json(order);
   } catch (error) {
     console.log(error);

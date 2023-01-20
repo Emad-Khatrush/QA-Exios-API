@@ -14,12 +14,16 @@ const upload = multer({
 
 const router  = express.Router();
 
+// Admin Routes
 router.route('/invoices')
       .get(protect, orders.getInvoices);
 
 router.route('/orders')
       .get(protect, orders.getOrders)
       .post(protect, upload.array('files'), orders.createOrder);
+
+router.route('/packages/orders')
+      .get(protect, orders.getPackagesOfOrders)
 
 router.route('/currentOrdersTab')
       .get(protect, orders.getOrdersTab)
@@ -45,5 +49,19 @@ router.route('/order/:id/cancel')
 
 router.route('/order/:id/addActivity')
       .post(protect, orders.createOrderActivity)
+
+// Client Routes
+
+router.route('/client/home')
+      .get(protect, orders.getClientHomeData)
+
+router.route('/user/:id/orders/:type')
+      .get(protect, orders.getOrdersForUser)
+
+router.route('/client/orders/search/:value')
+      .get(protect, orders.getOrdersClientBySearch)
+
+router.route('/client/order/:id')
+      .get(protect, orders.getClientOrder)
 
 module.exports = router;

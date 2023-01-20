@@ -12,28 +12,28 @@ const { generateString } = require('../middleware/helper');
 const os = require('os');
 console.log(os.cpus().length);
 
-module.exports.createUser = async (req, res) => {
-  try {
-    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-    const numbers = '0123456789';
+module.exports.createUser = async (req, res, next) => {
+  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  const numbers = '0123456789';
+  const { repeatedPassword, password, email } = req.body;
 
+  try {
+    if (repeatedPassword !== password) return next(new ErrorHandler(400, errorMessages.PASSWORD_NOT_MATCH));
     const customerId = generateString(1, characters) + generateString(3, numbers);
-    const userFound = await User.findOne({ customerId });
+    const userFound = await User.findOne({ $or: [ { customerId }, { username: email } ] });
     if (!!userFound) return next(new ErrorHandler(400, errorMessages.USER_EXIST));
     
     const hashedPassword = await bcrypt.hash(req.body.password, 12);
     const user = await User.create({
-      username: req.body.username,
-      firstName: req.body.firstName,
-      lastName: req.body.lastName,
-      imgUrl: req.body.imgUrl,
+      ...req.body,
+      username: email,
       password: hashedPassword,
       customerId,
       roles: {
-        isEmployee: true
+        isClient: true
       }
     });
-
+    console.log(user);
     const token = await user.getSignedToken();
     res.status(200).json({ success: true, token: token });
   } catch (error) {
@@ -41,6 +41,36 @@ module.exports.createUser = async (req, res) => {
     return next(new ErrorHandler(404, errorMessages.SERVER_ERROR));
   }
 }
+
+// module.exports.createUser = async (req, res) => {
+//   try {
+//     const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+//     const numbers = '0123456789';
+
+//     const customerId = generateString(1, characters) + generateString(3, numbers);
+//     const userFound = await User.findOne({ customerId });
+//     if (!!userFound) return next(new ErrorHandler(400, errorMessages.USER_EXIST));
+    
+//     const hashedPassword = await bcrypt.hash(req.body.password, 12);
+//     const user = await User.create({
+//       username: req.body.username,
+//       firstName: req.body.firstName,
+//       lastName: req.body.lastName,
+//       imgUrl: req.body.imgUrl,
+//       password: hashedPassword,
+//       customerId,
+//       roles: {
+//         isEmployee: true
+//       }
+//     });
+
+//     const token = await user.getSignedToken();
+//     res.status(200).json({ success: true, token: token });
+//   } catch (error) {
+//     console.log(error);
+//     return next(new ErrorHandler(404, errorMessages.SERVER_ERROR));
+//   }
+// }
 
 module.exports.getEmployees = async (req, res, next) => {
   try {
@@ -62,7 +92,7 @@ module.exports.getEmployees = async (req, res, next) => {
 }
 
 module.exports.login = async (req, res, next) => {
-  const { username, password } = req.body;
+  const { username, password, loginType } = req.body;
 
   if (!username || !password) {
     return next(new ErrorHandler(400, errorMessages.FIELDS_EMPTY));
@@ -75,6 +105,12 @@ module.exports.login = async (req, res, next) => {
     }
     if (user.isCanceled) {
       return next(new ErrorHandler(400, errorMessages.USER_SUBSCRIPTION_CANCLED));
+    }
+    if (loginType === 'client' && !user.roles.isClient) { 
+      return next(new ErrorHandler(400, errorMessages.USER_ROLE_INVALID));
+    }
+    if (loginType === 'admin' && user.roles.isClient) {
+      return next(new ErrorHandler(400, errorMessages.USER_ROLE_INVALID));
     }
     const isMatch = await user.matchPassword(password);
 

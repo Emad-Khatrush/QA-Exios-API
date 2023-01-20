@@ -33,10 +33,10 @@ const userSchema = new Schema({
     type: Boolean,
     default: false,
   },
-  orders: [{
-    type: Schema.Types.ObjectId,
-    ref: "Order",
-  }],
+  isAgreeToTermsOfCompany: {
+    type: Boolean,
+    default: false,
+  },
   roles: {
     isAdmin: {
       type: Boolean,

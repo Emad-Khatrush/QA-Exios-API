@@ -14,7 +14,7 @@ router.route('/home')
 router.route('/employees')
       .get(protect, users.getEmployees)
 
-router.post('/signup', users.createUser);
+router.post('/account/create', users.createUser);
 
 router.post('/verifyToken', users.verifyToken);
 
