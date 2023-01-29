@@ -30,7 +30,8 @@ module.exports.createIncome = async (req, res, next) => {
           path: uploadedImg.publicUrl,
           filename: uploadedImg.filename,
           folder: uploadedImg.folder,
-          bytes: uploadedImg.bytes
+          bytes: uploadedImg.bytes,
+          fileType: req.files[i].mimetype
         });
       }
     }
@@ -158,7 +159,8 @@ module.exports.uploadFiles= async (req, res, next) => {
         path: uploadedImg.publicUrl,
         filename: uploadedImg.filename,
         folder: uploadedImg.folder,
-        bytes: uploadedImg.bytes
+        bytes: uploadedImg.bytes,
+        fileType: req.files[i].mimetype
       });
       changedFields.push({
         label: 'image',

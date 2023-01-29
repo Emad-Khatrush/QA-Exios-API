@@ -1,0 +1,28 @@
+const express = require('express');
+
+const tasks = require('../controllers/tasks');
+const { protect } = require('../middleware/check-auth');
+const multer = require('multer');
+const upload = multer({
+      storage: multer.memoryStorage(),
+      limits: {
+            fileSize: 10 * 1024 * 1024, // No larger than 5mb, change as you need
+      },
+});
+const router  = express.Router();
+
+router.route('/mytasks')
+      .get(protect, tasks.getMyTasks)
+
+router.route('/task/:id')
+      .get(protect, tasks.getTask)
+      .put(protect, tasks.updateTask)
+
+router.route('/create/task')
+      .post(protect, upload.array('files'), tasks.createTask)
+
+router.route('/task/uploadFiles')
+      .post(protect, upload.array('files'), tasks.uploadFiles)
+      .delete(protect, tasks.deleteFile)
+
+module.exports = router;

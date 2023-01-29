@@ -128,7 +128,8 @@ module.exports.createOrder = async (req, res, next) => {
           filename: uploadedImg.filename,
           folder: uploadedImg.folder,
           bytes: uploadedImg.bytes,
-          category: req.body.invoicesCount > i ? 'invoice' : 'receipts'
+          category: req.body.invoicesCount > i ? 'invoice' : 'receipts',
+          fileType: req.files[i].mimetype
         });
       }
     }
@@ -431,7 +432,8 @@ module.exports.uploadFiles= async (req, res, next) => {
           filename: uploadedImg.filename,
           folder: uploadedImg.folder,
           bytes: uploadedImg.bytes,
-          category: req.body.type   
+          category: req.body.type,
+          fileType: req.files[i].mimetype
         });
         changedFields.push({
           label: 'image',
@@ -651,6 +653,7 @@ module.exports.getClientOrder = async (req, res, next) => {
     const order = await Orders.findOne(query);
 
     if (!order) return next(new ErrorHandler(404, errorMessages.ORDER_NOT_FOUND));
+    order.images = order.images.filter(img => img.category === 'receipts');
     
     res.status(200).json(order);
   } catch (error) {

@@ -22,6 +22,13 @@ const userSchema = new Schema({
     type: String,
     required: true,
   },
+  phone: {
+    type: Number,
+    required: true,
+  },
+  city: {
+    type: String,
+  },
   password: {
     type: String,
     required: true,

@@ -16,6 +16,9 @@ router.route('/employees')
 
 router.post('/account/create', users.createUser);
 
+router.route('/account/update')
+      .put(protect, users.updateUser);
+
 router.post('/verifyToken', users.verifyToken);
 
 router.post('/login', users.login);

@@ -11,6 +11,9 @@ exports.errorMessages = {
   // order errors
   ORDER_ID_TAKEN: 'order-id-taken',
   ORDER_NOT_FOUND: 'order-not-found',
+  // tasks errors
+  TASK_ID_TAKEN: 'order-id-taken',
+  TASK_NOT_FOUND: 'order-not-found',
   // expense errors
   EXPENSE_ID_TAKEN: 'expense-id-taken',
   EXPENSE_NOT_FOUND: 'expense-not-found',

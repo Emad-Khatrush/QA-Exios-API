@@ -33,9 +33,24 @@ module.exports.createUser = async (req, res, next) => {
         isClient: true
       }
     });
-    console.log(user);
+
     const token = await user.getSignedToken();
     res.status(200).json({ success: true, token: token });
+  } catch (error) {
+    console.log(error);
+    return next(new ErrorHandler(404, errorMessages.SERVER_ERROR));
+  }
+}
+
+module.exports.updateUser = async (req, res, next) => {
+  const { firstName, lastName, email, city, phone } = req.body;
+
+  try {
+    const user = await User.findByIdAndUpdate(req.user._id, {
+      firstName: firstName,
+    }, { new: true });
+
+    res.status(200).json({ ok: true });
   } catch (error) {
     console.log(error);
     return next(new ErrorHandler(404, errorMessages.SERVER_ERROR));

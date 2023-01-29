@@ -127,7 +127,8 @@ const orderSchema = new Schema({
     category: {
       type: String,
       enum: ['invoice', 'receipts']
-    }
+    },
+    fileType: String
   }],
   debt: {
     currency: String,

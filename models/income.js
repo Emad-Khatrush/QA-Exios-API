@@ -12,7 +12,8 @@ const incomeSchema = new Schema({
     filename: String,
     path: String,
     folder: String,
-    bytes: String
+    bytes: String,
+    fileType: String
   }],
   cost: {
     currency: String,
