@@ -3,6 +3,7 @@ const ErrorHandler = require('../utils/errorHandler');
 const { errorMessages } = require('../constants/errorTypes');
 const Order = require('../models/order');
 const { uploadToGoogleCloud } = require('../utils/googleClould');
+const Comment = require('../models/comment');
 
 module.exports.getMyTasks = async (req, res, next) => {
   const { taskType } = req.query;
@@ -20,7 +21,7 @@ module.exports.getMyTasks = async (req, res, next) => {
     let tasks = await Task.aggregate([
       { $match: mongoQuery[taskType] }
     ]);
-    tasks = await Task.populate(tasks, [{ path: 'reviewers' }, { path: 'order' }, { path: 'createdBy' }]);
+    tasks = await Task.populate(tasks, [{ path: 'reviewers' }, { path: 'order' }, { path: 'createdBy' }, { path: 'comments' }]);
 
     let newCount = await Task.count(mongoQuery['new']);
     let myTasksCount = await Task.count(mongoQuery['myTasks']);
@@ -95,7 +96,7 @@ module.exports.createTask = async (req, res, next) => {
 module.exports.getTask = async (req, res, next) => {
   try {
     const { id } = req.params
-    const task = await Task.findOne({ _id: id }).populate(['order', 'createdBy', 'reviewers']);
+    const task = await Task.findOne({ _id: id }).populate(['order', 'createdBy', 'reviewers', 'comments']);
     
     if (!task) next(new ErrorHandler(404, errorMessages.TASK_NOT_FOUND));
 
@@ -166,7 +167,7 @@ module.exports.updateTask = async (req, res, next) => {
       $set: { "reviewers": req.body.reviewers },
     }
     
-    const task = await Task.findByIdAndUpdate(String(id), updateQuery, { safe: true, upsert: true, new: true }).populate(['order', 'createdBy', 'reviewers']);
+    const task = await Task.findByIdAndUpdate(String(id), updateQuery, { safe: true, upsert: true, new: true }).populate(['order', 'createdBy', 'reviewers', 'comments']);
     if (!task) return next(new ErrorHandler(404, errorMessages.TASK_NOT_FOUND));
 
     // await Activities.create({
@@ -229,6 +230,47 @@ module.exports.changeTaskStatus = async (req, res, next) => {
     const task = await Task.findByIdAndUpdate(req.params.id, {
       status: req.body.status
     }, { safe: true, upsert: true, new: true });
+    res.status(200).json(task);
+  } catch (error) {
+    console.log(error);
+    return next(new ErrorHandler(404, error.message));
+  }
+}
+
+module.exports.getComments = async (req, res, next) => {
+  try {
+    let task = await Task.findOne({ _id: req.params.id });
+    if (!task) {
+      return next(new ErrorHandler(400, errorMessages.TASK_NOT_FOUND));
+    }
+
+    const comments = await Comment.find({ task }).sort({ createdAt: -1 }).populate('createdBy');
+    
+    res.status(200).json(comments);
+  } catch (error) {
+    console.log(error);
+    return next(new ErrorHandler(404, error.message));
+  }
+}
+
+module.exports.createComment = async (req, res, next) => {
+  try {
+    let task = await Task.findOne({ _id: req.params.id });
+    if (!task) {
+      return next(new ErrorHandler(400, errorMessages.TASK_NOT_FOUND));
+    }
+
+    const comment = await Comment.create({
+      createdBy: req.user,
+      message: req.body.message,
+      task
+    });
+
+    const updateQuery = {
+      $push: { "comments": comment },
+    }
+    
+    task = await Task.findByIdAndUpdate(String(req.params.id), updateQuery, { safe: true, upsert: true, new: true }).populate(['order', 'createdBy', 'reviewers']);
     res.status(200).json(task);
   } catch (error) {
     console.log(error);

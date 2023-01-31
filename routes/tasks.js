@@ -28,4 +28,8 @@ router.route('/task/uploadFiles')
       .post(protect, upload.array('files'), tasks.uploadFiles)
       .delete(protect, tasks.deleteFile)
 
+router.route('/task/:id/comments')
+      .get(protect, tasks.getComments)
+      .post(protect, tasks.createComment)
+
 module.exports = router;
