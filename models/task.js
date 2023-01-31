@@ -16,7 +16,7 @@ const taskSchema = new Schema({
     type: String,
     required: true,
     default: 'processing',
-    enum: ['processing', 'finished']
+    enum: ['processing', 'needsApproval', 'finished']
   },
   label: {
     type: String,

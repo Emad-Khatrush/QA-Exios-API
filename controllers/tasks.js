@@ -7,44 +7,27 @@ const { uploadToGoogleCloud } = require('../utils/googleClould');
 module.exports.getMyTasks = async (req, res, next) => {
   const { taskType } = req.query;
   try {
-    let tasks = await Task.find({ $or: [ { reviewers: { $in: [req.user._id] } } ] }).populate(['order', 'createdBy', 'reviewers']).sort({ createdAt: -1 });
-    let requestedTasks = await Task.find({ createdBy: req.user._id }).populate(['order', 'createdBy', 'reviewers']).sort({ createdAt: -1 });
-    let newCount = 0;
-    let myTasksCount = 0;
-    let urgentCount = 0;
-    let requestedTasksCount = requestedTasks.length;
-    let finishedCount = 0;
-    
-    tasks.forEach(task => {
-      var nowDate = new Date();
-      nowDate.setDate(nowDate.getDate() - 2);
-      if (task.createdAt >= nowDate) newCount++;
-      
-      if (task.status === 'processing') myTasksCount++;
+    const nowDate = new Date();
+    nowDate.setDate(nowDate.getDate() - 2);
+    let mongoQuery = {
+      new: { $or: [ { reviewers: { $in: [req.user._id] } } ], status: 'processing', createdAt: { $gte: nowDate } },
+      urgent: { $or: [ { reviewers: { $in: [req.user._id] } } ], status: 'processing', label: 'urgent' },
+      myTasks: { $or: [ { reviewers: { $in: [req.user._id] } } ], status: 'processing' },
+      requestedTasks: { createdBy: req.user._id, status: 'processing' },
+      needsApproval: { $or: [ { reviewers: { $in: [req.user._id] } }, { createdBy: req.user._id } ], status: 'needsApproval' },
+      finished: { $or: [ { reviewers: { $in: [req.user._id] } }, { createdBy: req.user._id } ], status: 'finished' }
+    };
+    let tasks = await Task.aggregate([
+      { $match: mongoQuery[taskType] }
+    ]);
+    tasks = await Task.populate(tasks, [{ path: 'reviewers' }, { path: 'order' }, { path: 'createdBy' }]);
 
-      if (task.label === 'urgent') {
-        urgentCount++;
-      }
-      
-      if (task.status === 'finished') {
-        finishedCount++;
-      }
-    });
-
-    if (taskType === 'new') {
-      var nowDate = new Date();
-      // get last 2 date
-      nowDate.setDate(nowDate.getDate() - 2);
-      tasks = tasks.filter((task) => task.createdAt >= nowDate);
-    } else if (taskType === 'urgent') {
-      tasks = tasks.filter((task) => task.label === taskType);
-    } else if (taskType === 'finished') {
-      tasks = tasks.filter((task) => task.status === taskType);
-    } else if (taskType === 'requestedTasks') {
-      tasks = requestedTasks;
-    } else {
-      tasks = tasks.filter((task) => task.status === 'processing');
-    }
+    let newCount = await Task.count(mongoQuery['new']);
+    let myTasksCount = await Task.count(mongoQuery['myTasks']);
+    let urgentCount = await Task.count(mongoQuery['urgent']);
+    let requestedTasksCount = await Task.count(mongoQuery['requestedTasks']);
+    let needsApproval = await Task.count(mongoQuery['needsApproval']);
+    let finishedCount = await Task.count(mongoQuery['finished']);
 
     // add count list
     res.status(200).json({
@@ -54,7 +37,8 @@ module.exports.getMyTasks = async (req, res, next) => {
         myTasksCount,
         urgentCount,
         finishedCount,
-        requestedTasksCount
+        requestedTasksCount,
+        needsApproval
       }
     });
   } catch (error) {
@@ -233,6 +217,18 @@ module.exports.deleteFile = async (req, res, next) => {
     //   }]
     // })
     
+    res.status(200).json(task);
+  } catch (error) {
+    console.log(error);
+    return next(new ErrorHandler(404, error.message));
+  }
+}
+
+module.exports.changeTaskStatus = async (req, res, next) => {
+  try {
+    const task = await Task.findByIdAndUpdate(req.params.id, {
+      status: req.body.status
+    }, { safe: true, upsert: true, new: true });
     res.status(200).json(task);
   } catch (error) {
     console.log(error);

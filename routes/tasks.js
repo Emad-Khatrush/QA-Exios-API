@@ -18,6 +18,9 @@ router.route('/task/:id')
       .get(protect, tasks.getTask)
       .put(protect, tasks.updateTask)
 
+router.route('/task/:id/status')
+      .put(protect, tasks.changeTaskStatus)
+
 router.route('/create/task')
       .post(protect, upload.array('files'), tasks.createTask)
 

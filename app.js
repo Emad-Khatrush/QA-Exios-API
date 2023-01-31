@@ -67,5 +67,5 @@ app.use((req, res) => {
 app.use(errorHandler);
 
 app.listen(process.env.PORT || 8000, () => {
-  console.log(`Server working on http://localhost:8000/`);
+  console.log(`Server working on http://localhost:${process.env.PORT || 8000}/`);
 })  
