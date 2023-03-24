@@ -8,7 +8,7 @@ const Offices = require('../models/office');
 const { addChangedField, getTapTypeQuery } = require('../middleware/helper');
 const { orderLabels } = require('../constants/orderLabels');
 const mongoose = require('mongoose');
-const order = require('../models/order');
+const Users = require('../models/user');
 
 module.exports.getInvoices = async (req, res, next) => {
   try {
@@ -112,12 +112,15 @@ module.exports.createOrder = async (req, res, next) => {
     if (!req.body) {
       return next(new ErrorHandler(400, errorMessages.FIELDS_EMPTY));
     }
-    const { fullName, email, phone, fromWhere, toWhere, method, exiosShipmentPrice, originShipmentPrice, weight, packageCount, netIncome, currency, debt } = req.body;
+    const { fullName, email, customerId, phone, fromWhere, toWhere, method, exiosShipmentPrice, originShipmentPrice, weight, packageCount, netIncome, currency, debt } = req.body;
     const orderId = orderid.generate().slice(7, 17);
     const isOrderIdTaken = await Orders.findOne({ orderId });
     if (!!isOrderIdTaken) {
       return next(new ErrorHandler(400, errorMessages.ORDER_ID_TAKEN));
     }
+
+    const user = await Users.findOne({ customerId });
+    if (!user) return next(new ErrorHandler(400, errorMessages.USER_NOT_FOUND));
 
     const images = [];
     if (req.files) {
@@ -158,7 +161,7 @@ module.exports.createOrder = async (req, res, next) => {
 
     const order = await Orders.create({
       ...req.body,
-      user: req.user,
+      user,
       orderId,
       customerInfo: {
         fullName,
@@ -240,11 +243,11 @@ module.exports.getOrder = async (req, res, next) => {
   if (!id) return next(new ErrorHandler(404, errorMessages.ORDER_NOT_FOUND));
 
   try {
-    let query = { orderId : String(id) };
+    let query = { $or: [{ orderId : String(id) }] };
     if (mongoose.Types.ObjectId.isValid(id)) {
       query = { _id: id };
     }
-    const order = await Orders.findOne(query).populate('madeBy');
+    const order = await Orders.findOne(query).populate(['madeBy', 'user']);
 
     if (!order) return next(new ErrorHandler(404, errorMessages.ORDER_NOT_FOUND));
     
@@ -288,6 +291,11 @@ module.exports.updateOrder = async (req, res, next) => {
   if (!id) return next(new ErrorHandler(404, errorMessages.ORDER_NOT_FOUND));
 
   try {
+    let user;
+    if (!!req.body.customerId) {
+      user = await Users.findOne({ customerId: req.body.customerId });
+      if (!user) return next(new ErrorHandler(400, errorMessages.USER_NOT_FOUND));
+    }
     const oldOrder = await Orders.findOne({ _id: String(id) });
     const update = {
       ...req.body,
@@ -304,6 +312,7 @@ module.exports.updateOrder = async (req, res, next) => {
         ...req.body.debt
       }
     }
+    if (user) update.user = user;
     const newOrder = await Orders.findOneAndUpdate({ _id: String(id) }, update, { new: true });
     if (!newOrder) return next(new ErrorHandler(404, errorMessages.ORDER_NOT_FOUND));
 
@@ -417,6 +426,51 @@ module.exports.createUnsureOrder = async (req, res, next) => {
     return next(new ErrorHandler(400, error.message));
   }
 }
+module.exports.uploadFilesToLinks= async (req, res, next) => {
+  const { id, paymentListId } = req.body;
+  
+  const images = [];
+  const changedFields = [];
+
+    if (req.files) {
+      for (let i = 0; i < req.files.length; i++) {
+        const uploadedImg = await uploadToGoogleCloud(req.files[i], "exios-admin-invoices");
+        images.push({
+          path: uploadedImg.publicUrl,
+          filename: uploadedImg.filename,
+          folder: uploadedImg.folder,
+          bytes: uploadedImg.bytes,
+          fileType: req.files[i].mimetype
+        });
+        changedFields.push({
+          label: 'image',
+          value: 'image',
+          changedFrom: '',
+          changedTo: uploadedImg.publicUrl
+        })
+      }
+    }
+
+  await Orders.updateOne({ _id: id, 'paymentList._id': paymentListId }, {
+    $push: { 'paymentList.$.images': images },
+  }, { safe: true, upsert: true, new: true });
+
+  const order = await Orders.findOne({ _id: id });
+
+  await Activities.create({
+    user: req.user,
+    details: {
+      path: '/invoices',
+      status: 'added',
+      type: 'order',
+      actionName: 'image',
+      actionId: order._id
+    },
+    changedFields
+  })
+
+  res.status(200).json(order);
+}
 
 module.exports.uploadFiles= async (req, res, next) => {
   const { id } = req.body;
@@ -461,6 +515,46 @@ module.exports.uploadFiles= async (req, res, next) => {
   })
 
   res.status(200).json(order)
+}
+
+module.exports.deleteLinkFiles= async (req, res, next) => {
+  try {
+    const order = await Orders.findOneAndUpdate({ _id: req.body.id, 'paymentList._id': req.body.paymentListId }, {
+      $pull: {
+        'paymentList.$.images': {
+          filename: req.body.filename
+        }
+      }
+    }, { safe: true, upsert: true, new: true });
+    console.log(order.paymentList[1]);
+
+    // const response = await cloudinary.uploader.destroy(req.body.image.filename);
+    // if (response.result !== 'ok') {
+    //   return next(new ErrorHandler(404, errorMessages.IMAGE_NOT_FOUND));
+    // }
+
+    // await Activities.create({
+    //   user: req.user,
+    //   details: {
+    //     path: '/invoices',
+    //     status: 'deleted',
+    //     type: 'order',
+    //     actionName: 'image',
+    //     actionId: order._id
+    //   },
+    //   changedFields: [{
+    //     label: 'image',
+    //     value: 'image',
+    //     changedFrom: req.body.image.path,
+    //     changedTo: ''
+    //   }]
+    // })
+    
+    res.status(200).json(order);
+  } catch (error) {
+    console.log(error);
+    return next(new ErrorHandler(404, error.message));
+  }
 }
 
 module.exports.deleteFiles= async (req, res, next) => {
@@ -529,26 +623,14 @@ module.exports.createOrderActivity = async (req, res, next) => {
 // Client Interface Controllers
 module.exports.getClientHomeData = async (req, res, next) => {
   try {
-    const orders = await Orders.find({ user: req.user._id, isCanceled: false });
-    let receivedOrders = 0;
-    let readyForReceivement = 0;
-    let totalPaidInvoices = 0;
-    let activeOrders = 0;
-
-    orders.forEach((order) => {
-      if (order.isCanceled) return;
-
-      totalPaidInvoices += order.totalInvoice;
-      if (order.isFinished) {
-        receivedOrders++;
-      }
-      if (!order.isFinished) {
-        activeOrders++;
-      }
-      if ((order.isPayment && order.orderStatus === 4) || (!order.isPayment && order.orderStatus === 3)) {
-        readyForReceivement++;
-      }
-    })
+    const receivedOrders = await Orders.count({ user: req.user._id, isFinished: true, unsureOrder: false });
+    const readyForReceivement = await Orders.count({ user: req.user._id, $or: [ { isPayment: true, orderStatus: 4 }, { isPayment: false, orderStatus: 3 } ] });
+    const activeOrders = await Orders.count({ user: req.user._id, isCanceled: false, unsureOrder: false, isFinished: false });
+    const totalPaidInvoices = (await Orders.aggregate([
+      { $match: { user: req.user._id, isCanceled: false, unsureOrder: false } },
+      { $group: { _id: 'id', total: { $sum: '$totalInvoice' } } },
+      { $project: { _id: 0 } }
+    ]))[0]?.total;
 
     res.status(200).json({
       results: {
@@ -568,33 +650,38 @@ module.exports.getClientHomeData = async (req, res, next) => {
 
 module.exports.getOrdersForUser = async (req, res, next) => {
   try {
-    const { id, type } = req.params;
+    const { type } = req.params;
 
     let orders;
+    const allOrders = await Orders.find({ user: req.user._id }).sort({ createdAt: -1 });
     if (type === 'all') {
-      orders = await Orders.find({ user: id, isCanceled: false });
+      orders = await Orders.find({ user: req.user._id, isCanceled: false, unsureOrder: false, }).sort({ createdAt: -1 });
     } else {
       const queryType = getTapTypeQuery(type);
-      orders = await Orders.find({ ...queryType, user: id, isCanceled: false});
+      orders = await Orders.find({ ...queryType, user: req.user._id, isCanceled: false }).sort({ createdAt: -1 });
     }
     let finishedOrders = 0;
     let readyForReceivement = 0;
     let warehouseArrived = 0;
     let activeOrders = 0;
+    let unsureOrders = 0;
 
-    orders.forEach((order) => {
+    allOrders.forEach((order) => {
       if (order.isCanceled) return;
 
       if (order.isFinished) {
         finishedOrders++;
       }
-      if (!order.isFinished) {
+      if (!order.isFinished && !order.unsureOrder) {
         activeOrders++;
       }
-      if ((order.isPayment && order.orderStatus === 2) || (!order.isPayment && order.orderStatus === 1)) {
+      if (!order.isFinished && order.unsureOrder) {
+        unsureOrders++;
+      }
+      if ((order.isPayment && order.orderStatus === 2) || (!order.isPayment && order.orderStatus === 1) && !order.unsureOrder) {
         warehouseArrived++;
       }
-      if ((order.isPayment && order.orderStatus === 4) || (!order.isPayment && order.orderStatus === 3)) {
+      if ((order.isPayment && order.orderStatus === 4) || (!order.isPayment && order.orderStatus === 3) && !order.unsureOrder) {
         readyForReceivement++;
       }
     })
@@ -606,7 +693,8 @@ module.exports.getOrdersForUser = async (req, res, next) => {
           finishedOrders,
           readyForReceivement,
           warehouseArrived,
-          activeOrders
+          activeOrders,
+          unsureOrders
         }
       }
     });
@@ -620,14 +708,19 @@ module.exports.getOrdersClientBySearch= async (req, res, next) => {
   const { value } = req.params;
 
   let query = [
-    { $match: { $or: [ {orderId: { $regex: new RegExp(value.toLowerCase(), 'i') }, user: req.user._id}, { 'paymentList.deliveredPackages.trackingNumber': { $regex: new RegExp(value.trim().toLowerCase(), 'i') }, user: req.user._id }, { 'customerInfo.fullName': { $regex: new RegExp(value.toLowerCase(), 'i') }, user: req.user._id } ] } }
+    { $match: { unsureOrder: false, $or: [ {orderId: { $regex: new RegExp(value.toLowerCase(), 'i') }, user: req.user._id}, { 'paymentList.deliveredPackages.trackingNumber': { $regex: new RegExp(value.trim().toLowerCase(), 'i') }, user: req.user._id }, { 'customerInfo.fullName': { $regex: new RegExp(value.toLowerCase(), 'i') }, user: req.user._id } ] } }
   ]
 
   if (value === '') {
     query = [
-      { $match: { user: req.user._id, isCanceled: false } }
+      { $match: { user: req.user._id, isCanceled: false, unsureOrder: false } }
     ]
   }
+
+  // sort newest order to top
+  query.push({
+    $sort: { createdAt: -1 }
+  })
 
   try {
     const orders = await Orders.aggregate(query);
@@ -637,6 +730,56 @@ module.exports.getOrdersClientBySearch= async (req, res, next) => {
       }
     })
   } catch (error) {
+    return next(new ErrorHandler(404, error.message));
+  }
+}
+
+module.exports.deleteUnsureOrder = async (req, res, next) => {
+  try {
+    const order = await Orders.findOne({ user: req.user, _id: req.params.id });
+    if (!order) return next(new ErrorHandler(404, errorMessages.ORDER_NOT_FOUND));
+    if (!order.unsureOrder) return next(new ErrorHandler(404, errorMessages.ORDER_CANT_DELETE));
+
+    await Orders.deleteOne({ user: req.user, _id: req.params.id });
+    res.status(200).json(order);
+  } catch (error) {
+    console.log(error);
+    return next(new ErrorHandler(404, error.message));
+  }
+}
+
+module.exports.createTrackingNumbersForClient = async (req, res, next) => {
+  try {
+    const trackingArray = [];
+    req.body.forEach(({ trackingNumber }) => {
+      trackingArray.push({
+        deliveredPackages: {
+          trackingNumber
+        }
+      })
+    })
+    const orderId = orderid.generate().slice(7, 17);
+
+    const order = await Orders.create({
+      user: req.user,
+      orderId,
+      customerInfo: {
+        fullName: '.',
+        phone: 0,
+      },
+      placedAt: 'tripoli',
+      shipment: {
+        fromWhere: '.',
+        toWhere: '.',
+        method: 'air'
+      },
+      isShipment: true,
+      unsureOrder: true,
+      paymentList: trackingArray
+    });
+    res.status(200).json(order);
+  } catch (error) {
+    console.log(error);
     return next(new ErrorHandler(404, error.message));
   }
 }
@@ -654,6 +797,7 @@ module.exports.getClientOrder = async (req, res, next) => {
 
     if (!order) return next(new ErrorHandler(404, errorMessages.ORDER_NOT_FOUND));
     order.images = order.images.filter(img => img.category === 'receipts');
+    order.paymentList = order.paymentList.filter(package => package.settings.visableForClient);
     
     res.status(200).json(order);
   } catch (error) {

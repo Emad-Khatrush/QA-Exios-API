@@ -12,7 +12,8 @@ const userSchema = new Schema({
   },
   customerId: {
     type: String,
-    unique: true
+    unique: true,
+    trim: true,
   },
   firstName: {
     type: String,

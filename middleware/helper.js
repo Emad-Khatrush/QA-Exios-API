@@ -53,13 +53,13 @@ exports.getTapTypeQuery = (tapType) => {
             return { isShipment: true,  unsureOrder: false, isPayment: false,  isFinished: false, isCanceled: false }
         
         case 'arriving':
-            return { isPayment: true,  orderStatus: 1, isCanceled: false }
+            return { unsureOrder: false, isPayment: true,  orderStatus: 1, isCanceled: false }
 
         case 'arrivedWarehouse':
             return { $or: [{isPayment: true,  orderStatus: 2, isCanceled: false }, {isPayment: false,  orderStatus: 1, isCanceled: false }] }
 
         case 'readyForPickup':
-            return { $or: [{isPayment: true,  orderStatus: 4, isCanceled: false }, {isPayment: false,  orderStatus: 3, isCanceled: false }] }
+            return { unsureOrder: false, $or: [{isPayment: true,  orderStatus: 4, isCanceled: false }, {isPayment: false,  orderStatus: 3, isCanceled: false }] }
         case 'unpaid':
             return { unsureOrder: false,  orderStatus: 0, isPayment: true, isCanceled: false }
 

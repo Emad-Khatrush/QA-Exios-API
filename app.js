@@ -18,6 +18,7 @@ const offices = require('./routes/offices');
 const sendMessages = require('./routes/sendMessages');
 const resetToken = require('./routes/resetToken');
 const tasks = require('./routes/tasks');
+const settings = require('./routes/settings');
 
 const app = express();
 
@@ -58,6 +59,7 @@ app.use('/api', incomes);
 app.use('/api', sendMessages);
 app.use('/api', resetToken);
 app.use('/api', tasks);
+app.use('/api', settings);
 
 app.use((req, res) => {
   res.status(404).send("Page Not Found");

@@ -1,6 +1,6 @@
 const express = require('express');
 const expenses = require('../controllers/expenses');
-const { protect } = require('../middleware/check-auth');
+const { protect, allowAdminsAndEmployee } = require('../middleware/check-auth');
 const multer = require('multer');
 
 // cloudinary settings
@@ -10,18 +10,18 @@ const upload = multer();
 const router  = express.Router();
 
 router.route('/expenses')
-      .get(protect, expenses.getExpenses)
-      .post(protect, upload.array('files'), expenses.createExpense);
+      .get(protect, allowAdminsAndEmployee, expenses.getExpenses)
+      .post(protect, allowAdminsAndEmployee, upload.array('files'), expenses.createExpense);
 
       
-      router.route('/expense/uploadFiles')
-      .post(protect, upload.array('files'), expenses.uploadFiles);
+router.route('/expense/uploadFiles')
+      .post(protect, allowAdminsAndEmployee, upload.array('files'), expenses.uploadFiles);
       
-      router.route('/expense/deleteFiles')
-      .delete(protect, expenses.deleteFiles);
+router.route('/expense/deleteFiles')
+      .delete(protect, allowAdminsAndEmployee, expenses.deleteFiles);
 
-      router.route('/expense/:id')
-            .get(protect, expenses.getExpense)
-            .put(protect, expenses.updateExpense);
+router.route('/expense/:id')
+      .get(protect, allowAdminsAndEmployee, expenses.getExpense)
+      .put(protect, allowAdminsAndEmployee, expenses.updateExpense);
 
 module.exports = router;

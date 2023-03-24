@@ -1,11 +1,11 @@
 const express = require('express');
 
 const sendMessages = require('../controllers/sendMessages');
-const { protect } = require('../middleware/check-auth');
+const { protect, isAdmin, isEmployee } = require('../middleware/check-auth');
 
 const router  = express.Router();
 
 router.route('/sendWhatsupMessage')
-      .post(protect, sendMessages.sendWhatsupMessage)
+      .post(protect, isAdmin, isEmployee, sendMessages.sendWhatsupMessage)
 
 module.exports = router;

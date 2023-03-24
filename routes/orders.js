@@ -1,7 +1,7 @@
 const express = require('express');
 
 const orders = require('../controllers/orders');
-const { protect } = require('../middleware/check-auth');
+const { protect, isAdmin, isClient, isEmployee, allowAdminsAndEmployee } = require('../middleware/check-auth');
 const multer = require('multer');
 // cloudinary settings
 const { storage } = require('../utils/cloudinary');
@@ -16,52 +16,62 @@ const router  = express.Router();
 
 // Admin Routes
 router.route('/invoices')
-      .get(protect, orders.getInvoices);
+      .get(protect, isAdmin, orders.getInvoices);
 
 router.route('/orders')
-      .get(protect, orders.getOrders)
-      .post(protect, upload.array('files'), orders.createOrder);
+      .get(protect, allowAdminsAndEmployee, orders.getOrders)
+      .post(protect, allowAdminsAndEmployee, upload.array('files'), orders.createOrder);
 
 router.route('/packages/orders')
-      .get(protect, orders.getPackagesOfOrders)
+      .get(protect, isAdmin, orders.getPackagesOfOrders)
 
 router.route('/currentOrdersTab')
-      .get(protect, orders.getOrdersTab)
+      .get(protect, allowAdminsAndEmployee, orders.getOrdersTab)
 
 router.route('/orders/:searchValue/:searchType')
-      .get(orders.getOrdersBySearch)
+      .get(protect, allowAdminsAndEmployee, orders.getOrdersBySearch)
 
 router.route('/unsureOrder/add')
-      .post(protect, orders.createUnsureOrder);
+      .post(protect, allowAdminsAndEmployee, orders.createUnsureOrder);
 
 router.route('/order/uploadFiles')
-      .post(protect, upload.array('files'), orders.uploadFiles);
+      .post(protect, allowAdminsAndEmployee, upload.array('files'), orders.uploadFiles);
+
+router.route('/order/upload/fileLink')
+      .post(protect, allowAdminsAndEmployee, upload.array('files'), orders.uploadFilesToLinks)
+      .delete(protect, allowAdminsAndEmployee, orders.deleteLinkFiles);
       
 router.route('/order/deleteFiles')
-      .delete(protect, orders.deleteFiles);
+      .delete(protect, allowAdminsAndEmployee, orders.deleteFiles);
 
 router.route('/order/:id')
-      .get(orders.getOrder)
-      .put(protect, orders.updateOrder);
+      .get(protect, allowAdminsAndEmployee, orders.getOrder)
+      .put(protect, allowAdminsAndEmployee, orders.updateOrder);
 
 router.route('/order/:id/cancel')
-      .post(protect, orders.cancelOrder);
+      .post(protect, allowAdminsAndEmployee, orders.cancelOrder);
 
 router.route('/order/:id/addActivity')
-      .post(protect, orders.createOrderActivity)
+      .post(protect, allowAdminsAndEmployee, orders.createOrderActivity)
 
 // Client Routes
 
 router.route('/client/home')
-      .get(protect, orders.getClientHomeData)
+      .get(protect, isClient, orders.getClientHomeData)
 
-router.route('/user/:id/orders/:type')
-      .get(protect, orders.getOrdersForUser)
+router.route('/client/orders/:type')
+      .get(protect, isClient, orders.getOrdersForUser)
 
 router.route('/client/orders/search/:value')
-      .get(protect, orders.getOrdersClientBySearch)
+      .get(protect, isClient, orders.getOrdersClientBySearch)
 
 router.route('/client/order/:id')
-      .get(protect, orders.getClientOrder)
+      .get(protect, isClient, orders.getClientOrder)
+
+router.route('/client/create/trackingNumber')
+      .post(protect, isClient, orders.createTrackingNumbersForClient)
+
+router.route('/client/unsureOrder/:id/delete')
+      .delete(protect, isClient, orders.deleteUnsureOrder)
 
 module.exports = router;

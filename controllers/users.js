@@ -30,6 +30,8 @@ module.exports.createUser = async (req, res, next) => {
       password: hashedPassword,
       customerId,
       roles: {
+        isAdmin: false,
+        isEmployee: false,
         isClient: true
       }
     });
@@ -43,14 +45,16 @@ module.exports.createUser = async (req, res, next) => {
 }
 
 module.exports.updateUser = async (req, res, next) => {
-  const { firstName, lastName, email, city, phone } = req.body;
+  const { firstName, lastName, city, phone } = req.body;
 
   try {
     const user = await User.findByIdAndUpdate(req.user._id, {
-      firstName: firstName,
+      firstName,
+      lastName,
+      city,
+      phone
     }, { new: true });
-
-    res.status(200).json({ ok: true });
+    res.status(200).json(user);
   } catch (error) {
     console.log(error);
     return next(new ErrorHandler(404, errorMessages.SERVER_ERROR));
@@ -114,7 +118,7 @@ module.exports.login = async (req, res, next) => {
   }
 
   try {
-    const user = await User.findOne({ username: { $regex: `^${username}$`, $options: 'i'} }).select('+password');
+    let user = await User.findOne({ username: { $regex: `^${username}$`, $options: 'i'} }).select('+password');
     if (!user) {
       return next(new ErrorHandler(404, errorMessages.USER_NOT_FOUND));
     }
@@ -132,6 +136,8 @@ module.exports.login = async (req, res, next) => {
     if (!isMatch) {
       return next(new ErrorHandler(404, errorMessages.INVALID_CREDENTIALS));
     }
+
+    user = await User.findOne({ username: { $regex: `^${username}$`, $options: 'i'} }, { password: 0 });
 
     const token = await user.getSignedToken();
     res.status(200).json({
@@ -159,6 +165,20 @@ module.exports.verifyToken = async (req, res, next) => {
     })
   } catch (error) {
     return next(new ErrorHandler(401, errorMessages.INVALID_TOKEN));
+  }
+}
+
+module.exports.getCustomerData = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const user = await User.findOne({ customerId: id });
+    if (!user) {
+      return next(new ErrorHandler(404, errorMessages.USER_NOT_FOUND));
+    }
+
+    res.status(200).json(user);
+  } catch (error) {
+    return next(new ErrorHandler(401, errorMessages.SERVER_ERROR));
   }
 }
 

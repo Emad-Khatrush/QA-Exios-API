@@ -15,10 +15,10 @@ exports.protect = async (req, res, next) => {
   try {
     const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
 
-    const user = await User.findById(decodedToken.id).select('-password');
+    const user = await User.findById(decodedToken.id, { password: 0 });
 
     if (!user) {
-      return next(new ErrorHandler(404, 'user-not-found'));
+      return next(new ErrorHandler(404, errorMessages.USER_NOT_FOUND));
     }
 
     if (user.isCanceled) {
@@ -31,4 +31,45 @@ exports.protect = async (req, res, next) => {
     console.log(error);
     return next(new ErrorHandler(404, 'authorize-invalid'));
   }
+}
+exports.isAdmin = async (req, res, next) => {
+  if (!req.user) {
+    return next(new ErrorHandler(404, errorMessages.USER_NOT_FOUND));
+  }
+  console.log(req.user.roles.isAdmin);
+  if (req.user.roles.isAdmin) {
+    return next();
+  }
+  return next(new ErrorHandler(404, 'authorize-invalid'));
+}
+
+exports.isClient = async (req, res, next) => {
+  if (!req.user) {
+    return next(new ErrorHandler(404, errorMessages.USER_NOT_FOUND));
+  }
+  if (req.user.roles.isClient) {
+    return next();
+  }
+  return next(new ErrorHandler(404, 'authorize-invalid'));
+}
+
+exports.isEmployee = async (req, res, next) => {
+  if (!req.user) {
+    return next(new ErrorHandler(404, errorMessages.USER_NOT_FOUND));
+  }
+  if (req.user.roles.isEmployee) {
+    return next();
+  }
+  return next(new ErrorHandler(404, 'authorize-invalid'));
+}
+
+exports.allowAdminsAndEmployee = async (req, res, next) => {
+  if (!req.user) {
+    return next(new ErrorHandler(404, errorMessages.USER_NOT_FOUND));
+  }
+
+  if (req.user.roles.isEmployee || req.user.roles.isAdmin) {
+    return next();
+  }
+  return next(new ErrorHandler(404, 'authorize-invalid'));
 }

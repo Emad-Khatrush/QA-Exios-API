@@ -1,23 +1,26 @@
 const express = require('express');
 
 const users = require('../controllers/users');
-const { protect } = require('../middleware/check-auth');
+const { protect, isEmployee, isAdmin, isClient, allowAdminsAndEmployee } = require('../middleware/check-auth');
 
 const router  = express.Router();
 
 router.route('/employeeHome')
-      .get(protect, users.getEmpoyeeHomeData)
+      .get(protect, isEmployee, users.getEmpoyeeHomeData)
 
 router.route('/home')
-      .get(protect, users.getHomeData)
+      .get(protect, isAdmin, users.getHomeData)
 
 router.route('/employees')
-      .get(protect, users.getEmployees)
+      .get(protect, allowAdminsAndEmployee, users.getEmployees)
 
-router.post('/account/create', users.createUser);
+router.route('/customer/:id')
+      .get(protect, allowAdminsAndEmployee, users.getCustomerData)
+
+router.post('/account/create', isClient, users.createUser);
 
 router.route('/account/update')
-      .put(protect, users.updateUser);
+      .put(protect, isClient, users.updateUser);
 
 router.post('/verifyToken', users.verifyToken);
 
