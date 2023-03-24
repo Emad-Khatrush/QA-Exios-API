@@ -17,7 +17,7 @@ router.route('/employees')
 router.route('/customer/:id')
       .get(protect, allowAdminsAndEmployee, users.getCustomerData)
 
-router.post('/account/create', isClient, users.createUser);
+router.post('/account/create', users.createUser);
 
 router.route('/account/update')
       .put(protect, isClient, users.updateUser);
