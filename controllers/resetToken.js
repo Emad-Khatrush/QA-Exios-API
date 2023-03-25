@@ -33,7 +33,7 @@ module.exports.sendPasswordToken = async (req, res, next) => {
 
     await sendEmail(email, 'اعادة كلمة المرور', {
       fullName: `${user.firstName} ${user.lastName}`,
-      resetLink: `http://localhost:8080/reset-password?token=${resetToken}&id=${user._id}`,
+      resetLink: `http://exioslibya.com/reset-password?token=${resetToken}&id=${user._id}`,
     }, '../templates/resetPassword.handlebars');
     res.status(200).send({});
 

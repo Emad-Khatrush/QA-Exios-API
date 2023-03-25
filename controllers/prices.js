@@ -44,7 +44,6 @@ module.exports.getPrices = async (req, res, next) => {
       })
       prices = await ShipmentPrices.find({});
     }
-    console.log(prices);
     res.status(200).json(prices)
   } catch (error) {
     return next(new ErrorHandler(404, error.message));
@@ -91,7 +90,6 @@ module.exports.getExchangeRate = async (req, res, next) => {
 module.exports.updateExchangeRate = async (req, res, next) => {
   try {
     const exchangeRate = req.body.exchangeRate;
-    console.log(exchangeRate);
     await ExchangeRate.updateOne({ _id: exchangeRate._id }, {
       $set: {
         rate: exchangeRate.rate

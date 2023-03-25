@@ -36,7 +36,6 @@ exports.isAdmin = async (req, res, next) => {
   if (!req.user) {
     return next(new ErrorHandler(404, errorMessages.USER_NOT_FOUND));
   }
-  console.log(req.user.roles.isAdmin);
   if (req.user.roles.isAdmin) {
     return next();
   }

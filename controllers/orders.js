@@ -630,7 +630,7 @@ module.exports.getClientHomeData = async (req, res, next) => {
       { $match: { user: req.user._id, isCanceled: false, unsureOrder: false } },
       { $group: { _id: 'id', total: { $sum: '$totalInvoice' } } },
       { $project: { _id: 0 } }
-    ]))[0]?.total;
+    ]))[0]?.total || 0;
 
     res.status(200).json({
       results: {
