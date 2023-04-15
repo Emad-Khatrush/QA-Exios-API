@@ -76,3 +76,12 @@ exports.getTapTypeQuery = (tapType) => {
             return { isFinished: false,  unsureOrder: false }
     }
 }
+
+exports.convertObjDataFromStringToNumberType = (obj) => {
+    for (let prop in obj) {
+        if (obj.hasOwnProperty(prop)) {
+            obj[prop] = Number(obj[prop]);
+        }
+    }
+    return obj;
+}

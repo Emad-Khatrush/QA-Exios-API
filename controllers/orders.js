@@ -5,7 +5,7 @@ const ErrorHandler = require('../utils/errorHandler');
 const { uploadToGoogleCloud } = require('../utils/googleClould');
 const { errorMessages } = require('../constants/errorTypes');
 const Offices = require('../models/office');
-const { addChangedField, getTapTypeQuery } = require('../middleware/helper');
+const { addChangedField, getTapTypeQuery, convertObjDataFromStringToNumberType } = require('../middleware/helper');
 const { orderLabels } = require('../constants/orderLabels');
 const mongoose = require('mongoose');
 const Users = require('../models/user');
@@ -87,6 +87,7 @@ module.exports.getOrdersTab = async (req, res, next) => {
 module.exports.getOrdersBySearch = async (req, res, next) => {
   const { searchValue, searchType } = req.params;
   const { tabType } = req.query;
+
   let query = [{ $match: { $or: [{orderId: { $regex: new RegExp(searchValue.toLowerCase(), 'i') }}, { 'customerInfo.fullName': { $regex: new RegExp(searchValue.toLowerCase(), 'i') } }] } }];
   const totalOrders = await Orders.count();
   if (searchType === 'trackingNumber') {
@@ -95,6 +96,7 @@ module.exports.getOrdersBySearch = async (req, res, next) => {
       { $match: { $or: [ { 'paymentList.deliveredPackages.trackingNumber': { $regex: new RegExp(searchValue.trim().toLowerCase(), 'i') } }, { 'customerInfo.fullName': { $regex: new RegExp(searchValue.toLowerCase(), 'i') } } ] } }
     ]
   }
+
   try {
     const orders = await Orders.aggregate(query);
     res.status(200).json({
@@ -651,51 +653,89 @@ module.exports.getClientHomeData = async (req, res, next) => {
 module.exports.getOrdersForUser = async (req, res, next) => {
   try {
     const { type } = req.params;
+    const query = convertObjDataFromStringToNumberType(req.query);
 
     let orders;
-    const allOrders = await Orders.find({ user: req.user._id }).sort({ createdAt: -1 });
     if (type === 'all') {
-      orders = await Orders.find({ user: req.user._id, isCanceled: false, unsureOrder: false, }).sort({ createdAt: -1 });
+      orders = await Orders.find({ user: req.user._id, isCanceled: false, unsureOrder: false, isFinished: false }, query).sort({ createdAt: -1 });
     } else {
       const queryType = getTapTypeQuery(type);
-      orders = await Orders.find({ ...queryType, user: req.user._id, isCanceled: false }).sort({ createdAt: -1 });
+      orders = await Orders.find({ ...queryType, user: req.user._id, isCanceled: false }, query).sort({ createdAt: -1 });
     }
-    let finishedOrders = 0;
-    let readyForReceivement = 0;
-    let warehouseArrived = 0;
-    let activeOrders = 0;
-    let unsureOrders = 0;
 
-    allOrders.forEach((order) => {
-      if (order.isCanceled) return;
+    let ordersCountList = (await Orders.aggregate([
+      { $match: { isCanceled: false, user: req.user._id } },
+      {
+        $group: {
+          _id: null,
+          finishedOrders: {
+            $sum: {
+              $cond: [
+                { $eq: ["$isFinished", true] },
+                1,
+                0
+              ]
+            }
+          },
+          activeOrders: {
+            $sum: {
+              $cond: [
+                { $and: [{ $eq: ["$isFinished", false] }, { $eq: ["$unsureOrder", false] }] },
+                1,
+                0
+              ]
+            }
+          },
+          unsureOrders: {
+            $sum: {
+              $cond: [
+                { $and: [{ $eq: ["$isFinished", false] }, { $eq: ["$unsureOrder", true] }] },
+                1,
+                0
+              ]
+            }
+          },
+          warehouseArrived: {
+            $sum: {
+              $cond: [
+                { $and: [ { $or: [{ $and: [{ $eq: ["$isPayment", true] }, { $eq: ["$orderStatus", 2] }] }, { $and: [{ $eq: ["$isPayment", false] }, { $eq: ["$orderStatus", 1] }] }] } ,{ $eq: ["$unsureOrder", false] }] },
+                1,
+                0
+              ]
+            }
+          },
+          readyForReceivement: {
+            $sum: {
+              $cond: [
+                { $and: [ { $or: [{ $and: [{ $eq: ["$isPayment", true] }, { $eq: ["$orderStatus", 4] }] }, { $and: [{ $eq: ["$isPayment", false] }, { $eq: ["$orderStatus", 3] }] }] } ,{ $eq: ["$unsureOrder", false] }] },
+                1,
+                0
+              ]
+            }
+          }
+        }
+      },
+      {
+        $project: {
+          _id: 0
+        }
+      }
+    ]))[0];
 
-      if (order.isFinished) {
-        finishedOrders++;
+    if (!ordersCountList) {
+      ordersCountList = {
+        finishedOrders: 0,
+        activeOrders: 0,
+        unsureOrders: 0,
+        warehouseArrived: 0,
+        readyForReceivement: 0
       }
-      if (!order.isFinished && !order.unsureOrder) {
-        activeOrders++;
-      }
-      if (!order.isFinished && order.unsureOrder) {
-        unsureOrders++;
-      }
-      if ((order.isPayment && order.orderStatus === 2) || (!order.isPayment && order.orderStatus === 1) && !order.unsureOrder) {
-        warehouseArrived++;
-      }
-      if ((order.isPayment && order.orderStatus === 4) || (!order.isPayment && order.orderStatus === 3) && !order.unsureOrder) {
-        readyForReceivement++;
-      }
-    })
+    }
 
     res.status(200).json({
       results: {
         orders,
-        countList: {
-          finishedOrders,
-          readyForReceivement,
-          warehouseArrived,
-          activeOrders,
-          unsureOrders
-        }
+        countList: ordersCountList || []
       }
     });
   } catch (error) {
@@ -720,6 +760,12 @@ module.exports.getOrdersClientBySearch= async (req, res, next) => {
   // sort newest order to top
   query.push({
     $sort: { createdAt: -1 }
+  })
+
+  // show only the important fields
+  const orderedList = convertObjDataFromStringToNumberType(req.query);
+  query.push({
+    $project: orderedList
   })
 
   try {
@@ -788,13 +834,13 @@ module.exports.getClientOrder = async (req, res, next) => {
   const id = req.params.id;
   if (!id) return next(new ErrorHandler(404, errorMessages.ORDER_NOT_FOUND));
 
+  const orderedByList = convertObjDataFromStringToNumberType(req.query);
   try {
     let query = { orderId : String(id), user: req.user._id };
     if (mongoose.Types.ObjectId.isValid(id)) {
       query = { _id: id, user: req.user._id };
     }
-    const order = await Orders.findOne(query);
-
+    const order = await Orders.findOne(query, orderedByList);
     if (!order) return next(new ErrorHandler(404, errorMessages.ORDER_NOT_FOUND));
     order.images = order.images.filter(img => img.category === 'receipts');
     order.paymentList = order.paymentList.filter(package => package.settings.visableForClient);
