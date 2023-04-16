@@ -45,8 +45,11 @@ router.route('/order/deleteFiles')
       .delete(protect, allowAdminsAndEmployee, orders.deleteFiles);
 
 router.route('/order/:id')
-      .get(protect, orders.getOrder)
+      .get(protect, allowAdminsAndEmployee, orders.getOrder)
       .put(protect, allowAdminsAndEmployee, orders.updateOrder);
+
+router.route('/order/:id/view')
+      .get(orders.getPublicOrder)
 
 router.route('/order/:id/cancel')
       .post(protect, allowAdminsAndEmployee, orders.cancelOrder);

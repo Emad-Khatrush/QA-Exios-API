@@ -260,6 +260,26 @@ module.exports.getOrder = async (req, res, next) => {
   }
 }
 
+module.exports.getPublicOrder = async (req, res, next) => {
+  const id = req.params.id;
+  if (!id) return next(new ErrorHandler(404, errorMessages.ORDER_NOT_FOUND));
+
+  try {
+    let query = { $or: [{ orderId : String(id) }] };
+    if (mongoose.Types.ObjectId.isValid(id)) {
+      query = { _id: id };
+    }
+    const order = await Orders.findOne(query).populate(['madeBy', 'user']);
+
+    if (!order) return next(new ErrorHandler(404, errorMessages.ORDER_NOT_FOUND));
+    
+    res.status(200).json(order);
+  } catch (error) {
+    console.log(error);
+    return next(new ErrorHandler(404, error.message));
+  }
+}
+
 module.exports.cancelOrder = async (req, res, next) => {
   const id = req.params.id;
   if (!id) return next(new ErrorHandler(404, errorMessages.ORDER_NOT_FOUND));
