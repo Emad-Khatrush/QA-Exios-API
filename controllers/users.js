@@ -184,8 +184,10 @@ module.exports.getCustomerData = async (req, res, next) => {
 
 module.exports.getEmpoyeeHomeData = async (req, res, next) => {
   try {
-    const offices = await Office.find({ office: 'tripoli' });
-    const debts = await Orders.find({ 'debt.total': { $gt: 0 }, placedAt: 'tripoli' });
+    const { office } = req.query;
+    const offices = await Office.find({ office: office || 'tripoli' });
+    const debts = await Orders.find({ 'debt.total': { $gt: 0 }, placedAt: office || 'tripoli' });
+
     res.status(200).json({
       offices,
       debts
