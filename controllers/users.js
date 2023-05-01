@@ -206,6 +206,8 @@ module.exports.getHomeData = async (req, res, next) => {
 
     const debts = await Orders.find({ 'debt.total': { $gt: 0 } });
 
+    const clientUsersCount = await User.count({ 'roles.isClient': true });
+
     const totalInvoices = (await Orders.aggregate([
       { $addFields: { 'month': { $month: '$createdAt' } } },
       { $match: { unsureOrder: false, isCanceled: false, month: currentMonthByNumber } },
@@ -281,7 +283,8 @@ module.exports.getHomeData = async (req, res, next) => {
       activeOrdersCount,
       totalInvoices,
       offices,
-      debts
+      debts,
+      clientUsersCount
     })
   } catch (error) {
     console.log(error);
