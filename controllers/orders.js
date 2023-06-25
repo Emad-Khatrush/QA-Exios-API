@@ -888,7 +888,7 @@ module.exports.getClientOrder = async (req, res, next) => {
 
 module.exports.getRatings = async (req, res, next) => {
   try {
-    const ordersRating = await OrderRating.find({});
+    const ordersRating = await OrderRating.find({}).populate(['user', 'order']).sort({ createdAt: -1 });
     
     res.status(200).json(ordersRating);
   } catch (error) {
