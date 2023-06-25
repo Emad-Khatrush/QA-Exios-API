@@ -12,6 +12,7 @@ exports.errorMessages = {
   ORDER_ID_TAKEN: 'order-id-taken',
   ORDER_NOT_FOUND: 'order-not-found',
   ORDER_CANT_DELETE: 'order-cant-delete',
+  ORDER_HAS_RATING: 'order_has_rating',
   // tasks errors
   TASK_ID_TAKEN: 'order-id-taken',
   TASK_NOT_FOUND: 'order-not-found',

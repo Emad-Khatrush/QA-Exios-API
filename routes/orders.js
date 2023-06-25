@@ -57,6 +57,9 @@ router.route('/order/:id/cancel')
 router.route('/order/:id/addActivity')
       .post(protect, allowAdminsAndEmployee, orders.createOrderActivity)
 
+router.route('/orders/rating')
+      .get(protect, isAdmin, orders.getRatings)
+
 // Client Routes
 
 router.route('/client/home')
@@ -76,5 +79,9 @@ router.route('/client/create/trackingNumber')
 
 router.route('/client/unsureOrder/:id/delete')
       .delete(protect, isClient, orders.deleteUnsureOrder)
+      
+router.route('/client/order/:id/rating')
+      .get(protect, isClient, orders.getOrderRating)
+      .post(protect, isClient, orders.createRatingForOrder)
 
 module.exports = router;

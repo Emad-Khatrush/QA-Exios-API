@@ -9,6 +9,7 @@ const { addChangedField, getTapTypeQuery, convertObjDataFromStringToNumberType }
 const { orderLabels } = require('../constants/orderLabels');
 const mongoose = require('mongoose');
 const Users = require('../models/user');
+const OrderRating = require('../models/orderRating');
 
 module.exports.getInvoices = async (req, res, next) => {
   try {
@@ -879,6 +880,51 @@ module.exports.getClientOrder = async (req, res, next) => {
     order.paymentList = order.paymentList.filter(package => package.settings.visableForClient);
     
     res.status(200).json(order);
+  } catch (error) {
+    console.log(error);
+    return next(new ErrorHandler(404, error.message));
+  }
+}
+
+module.exports.getRatings = async (req, res, next) => {
+  try {
+    const ordersRating = await OrderRating.find({});
+    
+    res.status(200).json(ordersRating);
+  } catch (error) {
+    console.log(error);
+    return next(new ErrorHandler(404, error.message));
+  }
+}
+
+module.exports.createRatingForOrder = async (req, res, next) => {
+  const orderId = req.params.id;
+  if (!orderId) return next(new ErrorHandler(404, errorMessages.ORDER_NOT_FOUND));
+
+  try {
+    const hasRaiting = await OrderRating.findOne({ order: orderId });
+    if (!!hasRaiting) return next(new ErrorHandler(404, errorMessages.ORDER_HAS_RATING));
+
+    const { questions } = req.body;
+    const createdRating = await OrderRating.create({
+      user: req.user,
+      order: orderId,
+      questions
+    })
+    
+    res.status(200).json(createdRating);
+  } catch (error) {
+    console.log(error);
+    return next(new ErrorHandler(404, error.message));
+  }
+}
+
+module.exports.getOrderRating = async (req, res, next) => {
+  try {
+    const orderId = req.params.id;
+    const orderRating = await OrderRating.findOne({ order: orderId });
+
+    res.status(200).json(orderRating);
   } catch (error) {
     console.log(error);
     return next(new ErrorHandler(404, error.message));
