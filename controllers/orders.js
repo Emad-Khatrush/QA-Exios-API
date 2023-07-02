@@ -732,7 +732,7 @@ module.exports.getOrdersForUser = async (req, res, next) => {
           warehouseArrived: {
             $sum: {
               $cond: [
-                { $and: [ { $or: [{ $and: [{ $eq: ["$isPayment", true] }, { $eq: ["$orderStatus", 2] }] }, { $and: [{ $eq: ["$isPayment", false] }, { $eq: ["$orderStatus", 1] }] }] } ,{ $eq: ["$unsureOrder", false] }] },
+                { $and: [ { $or: [{ $and: [{ $eq: ["$isPayment", true] }, { $or: [{ $eq: ["$orderStatus", 2] }, { $eq: ["$orderStatus", 3] }] }] }, { $and: [{ $eq: ["$isPayment", false] }, { $or: [{ $eq: ["$orderStatus", 1] }, { $eq: ["$orderStatus", 2] }] }] }] } ,{ $eq: ["$unsureOrder", false] }] },
                 1,
                 0
               ]
